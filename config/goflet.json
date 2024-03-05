@@ -1,0 +1,33 @@
+{
+  "httpConfig": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "httpsConfig": {
+      "enabled": false,
+      "cert": "",
+      "key": ""
+    }
+  },
+  "fileConfig": {
+    "baseFileStoragePath": "data",
+    "allowFolderCreation": true,
+    "uploadPath": "upload",
+    "uploadLimit": 1073741824
+  },
+  "cacheConfig": {
+    "cacheType": "MemoryCache",
+    "MemoryCache": {
+      "maxEntries": 1000,
+      "defaultTTL": 60
+    }
+  },
+  "jwtConfig": {
+    "algorithm": "HS256",
+    "Security": {
+      "signingKey": "goflet",
+      "publicKey": "",
+      "privateKey": ""
+    },
+    "trustedIssuers": null
+  }
+}
