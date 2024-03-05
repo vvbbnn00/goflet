@@ -2,7 +2,7 @@ package file
 
 import (
 	"github.com/gin-gonic/gin"
-	"goflet/middler"
+	"goflet/middleware"
 	"goflet/service"
 	"goflet/util"
 	"io"
@@ -17,10 +17,10 @@ func RegisterRoutes(router *gin.Engine) {
 	v1 := router.Group("/file")
 	{
 		// Register the routes
-		v1.GET("/*rpath", middler.FilePathChecker(), routeGetFile)
-		v1.PUT("/*rpath", middler.FilePathChecker(), routePutFile)
-		v1.POST("/*rpath", middler.FilePathChecker(), routePostFile)
-		v1.DELETE("/*rpath", middler.FilePathChecker(), routeDeleteFile)
+		v1.GET("/*rpath", middleware.FilePathChecker(), routeGetFile)
+		v1.PUT("/*rpath", middleware.FilePathChecker(), routePutFile)
+		v1.POST("/*rpath", middleware.FilePathChecker(), routePostFile)
+		v1.DELETE("/*rpath", middleware.FilePathChecker(), routeDeleteFile)
 	}
 }
 
