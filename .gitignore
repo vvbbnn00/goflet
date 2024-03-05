@@ -4,3 +4,4 @@ data
 cert
 upload
 /goflet.json
+.air.toml
