@@ -5,3 +5,4 @@ cert
 upload
 /goflet.json
 .air.toml
+*.exe
