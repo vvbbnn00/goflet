@@ -72,3 +72,23 @@ func ClarifyPath(path string) (string, error) {
 
 	return cleanPath, nil
 }
+
+// MatchPath Match the path with the paths
+func MatchPath(path string, paths []string) bool {
+	for _, p := range paths {
+		if match, _ := filepath.Match(p, path); match {
+			return true
+		}
+	}
+	return false
+}
+
+// MatchMethod Match the method with the methods
+func MatchMethod(method string, methods []string) bool {
+	for _, m := range methods {
+		if m == method {
+			return true
+		}
+	}
+	return false
+}
