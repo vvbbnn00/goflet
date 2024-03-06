@@ -1,0 +1,90 @@
+package util
+
+import (
+	"errors"
+	"github.com/golang-jwt/jwt"
+	"goflet/config"
+)
+
+var (
+	secretKey      string
+	publicKey      string
+	alg            string
+	trustedIssuers []string
+)
+
+func init() {
+	JwtInit()
+}
+
+func JwtInit() {
+	conf := config.GofletCfg.JWTConfig
+	alg = conf.Algorithm // The only supported algorithm defined in the configuration
+	secretKey = conf.Security.SigningKey
+	publicKey = conf.Security.PublicKey
+	trustedIssuers = conf.TrustedIssuers
+}
+
+var ErrInvalidAlgorithm = errors.New("invalid algorithm")
+var ErrUnsafeNoneAlgorithm = errors.New("none algorithm is not supported for security reasons")
+
+// JwtClaims The body of the JWT token
+type JwtClaims struct {
+	*jwt.StandardClaims
+	Paths []string `json:"paths"` // The paths that the token is allowed to access, supports wildcards
+}
+
+// ParseJwtToken Parse the JWT token
+func ParseJwtToken(tokenString string) (*JwtClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &JwtClaims{}, selectSecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*JwtClaims)
+	if !ok || !token.Valid {
+		return nil, err
+	}
+
+	// If there is no trusted issuer, trust any issuer
+	if len(trustedIssuers) == 0 {
+		return claims, nil
+	}
+
+	// Check if the issuer is trusted
+	found := false
+	issuer := claims.Issuer
+	for _, trustedIssuer := range trustedIssuers {
+		if issuer == trustedIssuer {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return nil, errors.New("untrusted issuer")
+	}
+
+	return claims, nil
+}
+
+// selectSecretKey The function to get the key for the JWT token
+func selectSecretKey(token *jwt.Token) (interface{}, error) {
+	if token.Method.Alg() != alg {
+		return nil, ErrInvalidAlgorithm
+	}
+
+	switch token.Method.Alg() {
+	case jwt.SigningMethodHS256.Name, jwt.SigningMethodHS384.Name, jwt.SigningMethodHS512.Name:
+		return []byte(secretKey), nil
+	case jwt.SigningMethodRS256.Name, jwt.SigningMethodRS384.Name, jwt.SigningMethodRS512.Name:
+		return jwt.ParseRSAPublicKeyFromPEM([]byte(publicKey))
+	case jwt.SigningMethodES256.Name, jwt.SigningMethodES384.Name, jwt.SigningMethodES512.Name:
+		return jwt.ParseECPublicKeyFromPEM([]byte(publicKey))
+	case jwt.SigningMethodPS256.Name, jwt.SigningMethodPS384.Name, jwt.SigningMethodPS512.Name:
+		return jwt.ParseRSAPublicKeyFromPEM([]byte(publicKey))
+	case jwt.SigningMethodNone.Alg():
+		return nil, ErrUnsafeNoneAlgorithm
+	default:
+		return nil, ErrInvalidAlgorithm
+	}
+}
