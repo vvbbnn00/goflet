@@ -14,7 +14,7 @@ import (
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes(router *gin.Engine) {
-	v1 := router.Group("/file", middleware.FilePathChecker())
+	v1 := router.Group("/file", middleware.AuthChecker(), middleware.FilePathChecker())
 	{
 		// Register the routes
 		v1.GET("/*rpath", routeGetFile)
