@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/gob"
 	"errors"
+	"goflet/cache"
 	"goflet/util"
 	"goflet/util/base58"
 	"log"
@@ -12,6 +13,7 @@ import (
 )
 
 const metaAppend = ".meta"
+const fileMetaCachePrefix = "file_meta_"
 
 type FileHash struct {
 	HashSha1   string `json:"sha1"`
@@ -114,6 +116,21 @@ func GetFileMeta(path string) FileMeta {
 	}
 
 	metaFilePath := fsPath + metaAppend
+
+	// Check if the file metadata is cached
+	c := cache.GetCache()
+	cacheKey := fileMetaCachePrefix + metaFilePath
+
+	cachedMeta, err := c.GetString(cacheKey)
+	if err == nil {
+		fileMeta := FileMeta{}
+		err = gob.NewDecoder(strings.NewReader(cachedMeta)).Decode(&fileMeta)
+		if err != nil {
+			log.Printf("Error decoding meta file: %s", err.Error())
+		}
+		return fileMeta
+	}
+
 	metaFile, err := os.OpenFile(metaFilePath, os.O_RDONLY, 0644)
 
 	fileMeta := FileMeta{}
@@ -127,6 +144,13 @@ func GetFileMeta(path string) FileMeta {
 
 	// Close the file
 	_ = metaFile.Close()
+
+	// Cache the file metadata
+	go func() {
+		metaFileString := strings.Builder{}
+		_ = gob.NewEncoder(&metaFileString).Encode(fileMeta)
+		_ = c.Set(cacheKey, metaFileString.String())
+	}()
 
 	return fileMeta
 }
@@ -162,12 +186,21 @@ func UpdateFileMeta(path string, fileMeta FileMeta) error {
 	}
 
 	err = gob.NewEncoder(metaFile).Encode(fileMeta)
-
-	// Close the file
-	_ = metaFile.Close()
 	if err != nil {
 		return err
 	}
+
+	// Close the file
+	_ = metaFile.Close()
+
+	// Cache the file metadata
+	go func() {
+		c := cache.GetCache()
+		cacheKey := fileMetaCachePrefix + metaFilePath
+		metaFileString := strings.Builder{}
+		_ = gob.NewEncoder(&metaFileString).Encode(fileMeta)
+		_ = c.Set(cacheKey, metaFileString.String())
+	}()
 
 	return nil
 }
@@ -194,6 +227,13 @@ func DeleteFile(path string) error {
 	metaFilePath := fsPath + metaAppend
 
 	_ = os.Remove(metaFilePath)
+
+	// Delete the file metadata cache
+	go func() {
+		c := cache.GetCache()
+		cacheKey := fileMetaCachePrefix + metaFilePath
+		_ = c.Del(cacheKey)
+	}()
 
 	return nil
 }
