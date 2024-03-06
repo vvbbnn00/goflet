@@ -21,7 +21,7 @@ func GetTempFileWriteStream(path string) (*os.File, error) {
 		return nil, err
 	}
 
-	// If has subdirectory, check whether the directory can be created
+	// If it has subdirectory, check whether the directory can be created
 	dir := filepath.Dir(fsPath)
 	if dir != "." && !canCreateFolder {
 		return nil, errors.New("directory_creation")
