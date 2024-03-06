@@ -3,6 +3,7 @@ package config
 import (
 	_ "embed"
 	"encoding/json"
+	"log"
 	"os"
 	"strconv"
 )
@@ -50,6 +51,7 @@ type GofletConfig struct {
 	} `json:"cacheConfig"`
 	JWTConfig struct {
 		// JWT configuration
+		Enabled   bool   `json:"enabled" default:"true"`    // Enable JWT
 		Algorithm string `json:"algorithm" default:"HS256"` // The algorithm to be used for the JWT
 		Security  struct {
 			// Security configuration
@@ -103,6 +105,11 @@ func InitConfig() {
 	err := loadConfig()
 	if err != nil {
 		panic(err)
+	}
+
+	// Set the default value for the cache type
+	if !GofletCfg.JWTConfig.Enabled {
+		log.Printf("[WARN] JWT is disabled, the security of the application is not guaranteed.")
 	}
 }
 

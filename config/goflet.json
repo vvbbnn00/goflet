@@ -23,6 +23,7 @@
     }
   },
   "jwtConfig": {
+    "enabled": true,
     "algorithm": "HS256",
     "Security": {
       "signingKey": "goflet",
