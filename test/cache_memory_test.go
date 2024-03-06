@@ -102,7 +102,7 @@ func TestExists(t *testing.T) {
 		t.Errorf("The key [integer] should exist.")
 	}
 
-	exists, err = c.Exists("nonexistent")
+	_, err = c.Exists("nonexistent")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
 	}
