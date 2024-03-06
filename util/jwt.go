@@ -31,7 +31,15 @@ var ErrUnsafeNoneAlgorithm = errors.New("none algorithm is not supported for sec
 // JwtClaims The body of the JWT token
 type JwtClaims struct {
 	*jwt.StandardClaims
-	Paths []string `json:"paths"` // The paths that the token is allowed to access, supports wildcards
+	Paths   []string `json:"paths"`   // The paths that the token is allowed to access, supports wildcards
+	Methods []string `json:"methods"` // The methods that the token is allowed to access
+}
+
+func (c *JwtClaims) Valid() error {
+	if c.StandardClaims == nil { // Check StandardClaims in case of nil pointer dereference
+		return errors.New("missing required fields")
+	}
+	return c.StandardClaims.Valid()
 }
 
 // ParseJwtToken Parse the JWT token
@@ -43,7 +51,7 @@ func ParseJwtToken(tokenString string) (*JwtClaims, error) {
 
 	claims, ok := token.Claims.(*JwtClaims)
 	if !ok || !token.Valid {
-		return nil, err
+		return nil, errors.New("invalid token") // Should make an error instance here.
 	}
 
 	// If there is no trusted issuer, trust any issuer
