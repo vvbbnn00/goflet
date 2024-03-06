@@ -44,10 +44,10 @@ func getValueType(value interface{}) ValueType {
 		return ValueFloat
 	case reflect.Bool:
 		return ValueBool
-	case reflect.Slice, reflect.Array:
-		return ValueArray
-	case reflect.Map:
-		return ValueMap
+	// case reflect.Slice, reflect.Array:
+	// 	return ValueArray
+	// case reflect.Map:
+	// 	return ValueMap
 	default:
 		return ValueUnknown
 	}
@@ -132,26 +132,12 @@ func (c *MemoryCache) GetBool(key string) (bool, error) {
 
 // GetArray returns the array value from the memory cache
 func (c *MemoryCache) GetArray(key string) ([]interface{}, error) {
-	value, ok := c.get(key)
-	if !ok {
-		return nil, errCacheMiss
-	}
-	if value.Type != ValueArray {
-		return nil, errTypeMismatch
-	}
-	return value.Value.([]interface{}), nil
+	return nil, errTypeMismatch // Not implemented
 }
 
 // GetMap returns the map value from the memory cache
 func (c *MemoryCache) GetMap(key string) (map[string]interface{}, error) {
-	value, ok := c.get(key)
-	if !ok {
-		return nil, errCacheMiss
-	}
-	if value.Type != ValueMap {
-		return nil, errTypeMismatch
-	}
-	return value.Value.(map[string]interface{}), nil
+	return nil, errTypeMismatch // Not implemented
 }
 
 // Set sets the value to the memory cache
