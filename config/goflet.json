@@ -12,7 +12,8 @@
     "baseFileStoragePath": "data",
     "allowFolderCreation": true,
     "uploadPath": "upload",
-    "uploadLimit": 1073741824
+    "uploadLimit": 1073741824,
+    "uploadTimeout": 7200
   },
   "cacheConfig": {
     "cacheType": "MemoryCache",
@@ -29,5 +30,9 @@
       "privateKey": ""
     },
     "trustedIssuers": null
+  },
+  "cronConfig": {
+    "deleteEmptyFolder": 3600,
+    "cleanOutdatedFile": 3600
   }
 }

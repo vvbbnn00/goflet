@@ -3,6 +3,7 @@ package main
 import (
 	"goflet/config"
 	"goflet/route"
+	"goflet/scheduled_task"
 	"log"
 )
 
@@ -33,6 +34,8 @@ func main() {
 			log.Printf("HTTP server started on %s", endpoint)
 		}()
 	}
+
+	scheduled_task.RunScheduledTask()
 
 	// Wait for keyboard interrupt to stop the servers
 	select {}

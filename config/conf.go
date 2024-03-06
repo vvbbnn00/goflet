@@ -37,6 +37,7 @@ type GofletConfig struct {
 		UploadPath          string `json:"uploadPath" default:"upload"`        // The path where the files will be temporarily stored before moving to the base path
 		AllowFolderCreation bool   `json:"allowFolderCreation" default:"true"` // Allow the creation of folders, otherwise the files will be stored in the base path
 		UploadLimit         int64  `json:"uploadLimit" default:"1073741824"`   // The maximum size of the file to be uploaded
+		UploadTimeout       int    `json:"uploadTimeout" default:"7200"`       // The maximum time to wait for the file to be uploaded
 	} `json:"fileConfig"`
 	CacheConfig struct {
 		// Cache configuration
@@ -58,6 +59,11 @@ type GofletConfig struct {
 		}
 		TrustedIssuers []string `json:"trustedIssuers"` // The list of trusted issuers for the JWT, if empty, it will trust any issuer
 	} `json:"jwtConfig"`
+	CronConfig struct {
+		// Cron configuration, if the value le 0, the cron job will be disabled
+		DeleteEmptyFolder int `json:"deleteEmptyFolder" default:"3600"` // The interval to delete empty folders, in seconds
+		CleanOutdatedFile int `json:"cleanOutdatedFile" default:"3600"` // The interval to clean outdated files, in seconds
+	} `json:"cronConfig"`
 }
 
 // GetEndpoint returns the endpoint for the HTTP/S server
