@@ -21,10 +21,6 @@ func AuthChecker() gin.HandlerFunc {
 		currentPath := c.Request.URL.Path
 		method := c.Request.Method
 
-		if method == "POST" {
-			print(c.Request.Header)
-		}
-
 		// Get the token from the query first, because the query has higher priority
 		token := c.Query(AuthQuery)
 		if token == "" {
