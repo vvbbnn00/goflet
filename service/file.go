@@ -13,6 +13,7 @@ import (
 )
 
 const MetaAppend = ".meta"
+const FileAppend = ".file"
 const FileMetaCachePrefix = "file_meta_"
 
 type FileHash struct {
@@ -69,12 +70,14 @@ func GetFileInfo(path string) (FileInfo, error) {
 		return FileInfo{}, err
 	}
 
+	fsPath += FileAppend
+
 	file, err := os.Stat(fsPath)
 	if err != nil {
 		return FileInfo{}, err
 	}
 
-	name, _ := base58.Decode(file.Name())
+	name, _ := base58.Decode(strings.TrimSuffix(filepath.Base(fsPath), FileAppend))
 
 	fileInfo := FileInfo{
 		FilePath:     path,
@@ -100,6 +103,8 @@ func GetFileReader(path string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	fsPath += FileAppend
 
 	file, err := os.OpenFile(fsPath, os.O_RDONLY, 0644)
 	if err != nil {
@@ -215,6 +220,8 @@ func DeleteFile(path string) error {
 	if err != nil {
 		return err
 	}
+
+	fsPath += FileAppend
 
 	// Check if the file exists
 	_, err = os.Stat(fsPath)

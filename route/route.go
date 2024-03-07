@@ -2,8 +2,8 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
+	"goflet/route/api"
 	"goflet/route/file"
-	"goflet/route/onlyoffice"
 )
 
 // RegisterRoutes load all the enabled routes for the application
@@ -12,7 +12,7 @@ func RegisterRoutes() *gin.Engine {
 
 	// Register the routes
 	file.RegisterRoutes(router)
-	onlyoffice.RegisterRoutes(router)
+	api.RegisterRoutes(router)
 
 	return router
 }

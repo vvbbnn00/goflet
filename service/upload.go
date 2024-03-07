@@ -81,6 +81,8 @@ func CompleteFileUpload(path string) error {
 		return err
 	}
 
+	fsPath_ += FileAppend
+
 	// Open the temporary file to get file header info
 	mimeType, err := mimetype.DetectFile(tmpPath)
 	if err != nil {
