@@ -28,11 +28,17 @@ func JwtInit() {
 var ErrInvalidAlgorithm = errors.New("invalid algorithm")
 var ErrUnsafeNoneAlgorithm = errors.New("none algorithm is not supported for security reasons")
 
+// Permission The permission of the token
+type Permission struct {
+	Path    string            `json:"path"`    // The path that the token is allowed to access, supports wildcards
+	Methods []string          `json:"methods"` // The methods that the token is allowed to access
+	Query   map[string]string `json:"query"`   // The query parameters, if set in the map, the query should match the map
+}
+
 // JwtClaims The body of the JWT token
 type JwtClaims struct {
 	*jwt.StandardClaims
-	Paths   []string `json:"paths"`   // The paths that the token is allowed to access, supports wildcards
-	Methods []string `json:"methods"` // The methods that the token is allowed to access
+	Permissions []Permission `json:"permissions"` // The permissions of the token
 }
 
 func (c *JwtClaims) Valid() error {

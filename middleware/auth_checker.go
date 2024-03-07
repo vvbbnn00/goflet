@@ -3,6 +3,10 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/util"
+	"log"
+	"net/http"
+	"net/url"
+	"path"
 	"strings"
 )
 
@@ -15,59 +19,97 @@ const (
 	AuthQuery = "token"
 )
 
-// AuthChecker Ensures the request is authenticated
+// AuthChecker ensures the request is authenticated and authorized
 func AuthChecker() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		currentPath := c.Request.URL.Path  // The current path
-		rawQuery := c.Request.URL.RawQuery // The raw query
-
-		if rawQuery != "" {
-			currentPath += "?" + rawQuery // Append the raw query to the current path
-		}
-
-		method := c.Request.Method
-
-		// Get the token from the query first, because the query has higher priority
-		token := c.Query(AuthQuery)
+		token := extractToken(c)
 		if token == "" {
-			// Get the token from the header
-			token = c.GetHeader(AuthHeader)
-			// If the token is not empty, it must start with "Bearer"
-			if !strings.HasPrefix(token, Bearer) {
-				c.JSON(401, gin.H{"error": "Unauthorized"})
-				c.Abort()
-				return
-			}
-			// Remove the "Bearer" prefix
-			token = strings.TrimPrefix(token, Bearer)
-		}
-
-		// If the token is empty
-		if token == "" {
-			c.JSON(401, gin.H{"error": "Unauthorized"})
-			c.Abort()
+			unauthorized(c, "Missing token")
 			return
 		}
 
-		//println("Token: ", token)
-		claims, err := util.ParseJwtToken(token)
+		claims, err := parseToken(token)
 		if err != nil {
-			c.JSON(401, gin.H{"error": "Unauthorized"})
-			c.Abort()
+			unauthorized(c, "Invalid token")
 			return
 		}
 
-		if !util.MatchMethod(method, claims.Methods) {
-			c.JSON(403, gin.H{"error": "Forbidden"})
-			c.Abort()
+		if !isAuthorized(c, claims.Permissions) {
+			unauthorized(c, "Unauthorized access")
 			return
 		}
 
-		// Check whether the path is match
-		if !util.MatchPath(currentPath, claims.Paths) {
-			c.JSON(403, gin.H{"error": "Forbidden"})
-			c.Abort()
-			return
+		c.Next()
+	}
+}
+
+// extractToken Extract the JWT token from the request
+func extractToken(c *gin.Context) string {
+	token := c.Query(AuthQuery) // Check the query parameter
+	if token != "" {
+		return token
+	}
+
+	token = c.GetHeader(AuthHeader) // Check the header
+	if strings.HasPrefix(token, Bearer) {
+		return strings.TrimPrefix(token, Bearer)
+	}
+
+	return ""
+}
+
+// parseToken Parse the JWT token
+func parseToken(tokenString string) (*util.JwtClaims, error) {
+	claims, err := util.ParseJwtToken(tokenString)
+	if err == nil {
+		return claims, nil
+	}
+	return nil, err
+}
+
+// methodMatch Check if the method is in the list of methods
+func methodMatch(methods []string, method string) bool {
+	for _, m := range methods {
+		if m == method {
+			return true
 		}
 	}
+	return false
+}
+
+// queryMatch Check if the query matches the permission query
+func queryMatch(query url.Values, permQuery map[string]string) bool {
+	for k, v := range permQuery {
+		if query.Get(k) != v {
+			return false
+		}
+	}
+	return true
+}
+
+// isAuthorized Check if the token is authorized to access the path
+func isAuthorized(c *gin.Context, permissions []util.Permission) bool {
+	currentPath := c.Request.URL.Path
+	method := c.Request.Method
+
+	for _, perm := range permissions {
+		// Check if the path matches
+		match, err := path.Match(perm.Path, currentPath)
+		if err != nil {
+			log.Printf("Bad pattern: %s", perm.Path)
+			continue
+		}
+		// Check if the method matches
+		if match || perm.Path == "*" {
+			return methodMatch(perm.Methods, method) && queryMatch(c.Request.URL.Query(), perm.Query)
+		}
+	}
+
+	return false
+}
+
+// unauthorized Return an unauthorized response
+func unauthorized(c *gin.Context, message string) {
+	c.JSON(http.StatusUnauthorized, gin.H{"error": message})
+	c.Abort()
 }
