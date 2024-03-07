@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	maxJobRetries   = 3 // Maximum number of retries for a job
-	NoPoolSizeLimit = 0 // No limit for the job queue size
+	maxJobRetries    = 3 // Maximum number of retries for a job
+	NoPoolBufferSize = 0 // No buffer for the job chain
 )
 
 const retryDelay = 1 * time.Second // Delay before retrying a job
@@ -96,10 +96,12 @@ func NewPool(workerCount int, jobQueueSize int, workerFactory func() Worker) *Po
 	if workerCount <= 0 {
 		panic("Invalid worker count")
 	}
-	if jobQueueSize < 0 {
-		panic("Invalid job queue size")
+	var jobChain chan Job
+	if jobQueueSize == NoPoolBufferSize {
+		jobChain = make(chan Job)
+	} else {
+		jobChain = make(chan Job, jobQueueSize)
 	}
-	jobChain := make(chan Job, jobQueueSize)
 	return &Pool{
 		WorkerCount:   workerCount,
 		JobChain:      jobChain,
