@@ -56,10 +56,15 @@ func routeGetFile(c *gin.Context) {
 		_ = file.Close()
 	}(file)
 
+	fileType := fileInfo.FileMeta.MimeType
+	if fileType == "" {
+		fileType = "application/octet-stream" // Default to application/octet-stream
+	}
+
 	// Set common headers
 	c.Header("Accept-Ranges", "bytes")
 	c.Header("Content-Disposition", "attachment; filename="+fileInfo.FileName)
-	c.Header("Content-Type", "application/octet-stream")
+	c.Header("Content-Type", fileType)
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Last-Modified", util.Int64ToHeaderDate(fileInfo.LastModified))
 	c.Header("X-Uploaded-At", util.Int64ToHeaderDate(fileInfo.FileMeta.UploadedAt))

@@ -23,6 +23,7 @@ type FileHash struct {
 
 type FileMeta struct {
 	Hash       FileHash `json:"hash"`       // The hash of the file
+	MimeType   string   `json:"mimeType"`   // The mime type of the file
 	UploadedAt int64    `json:"uploadedAt"` // The time the file was uploaded
 }
 
@@ -171,6 +172,9 @@ func UpdateFileMeta(path string, fileMeta FileMeta) error {
 	}
 	if fileMeta.Hash.HashSha256 == "" {
 		fileMeta.Hash.HashSha256 = oldFileMeta.Hash.HashSha256
+	}
+	if fileMeta.MimeType == "" {
+		fileMeta.MimeType = oldFileMeta.MimeType
 	}
 
 	// Save the new file metadata

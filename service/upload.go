@@ -2,12 +2,14 @@ package service
 
 import (
 	"errors"
+	"github.com/gabriel-vasile/mimetype"
 	"goflet/config"
 	"goflet/util"
 	"goflet/util/base58"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -79,6 +81,17 @@ func CompleteFileUpload(path string) error {
 		return err
 	}
 
+	// Open the temporary file to get file header info
+	mimeType, err := mimetype.DetectFile(tmpPath)
+	if err != nil {
+		return err
+	}
+	mimeTypeStr := mimeType.String()
+	// If the file type is like html, xml, etc, set it to text/plain
+	if strings.HasPrefix(mimeTypeStr, "text/") {
+		mimeTypeStr = "text/plain"
+	}
+
 	// Rename the temporary file to the final file
 	err = os.Rename(tmpPath, fsPath_) // This will replace the file if it already exists
 	if err != nil {
@@ -88,6 +101,7 @@ func CompleteFileUpload(path string) error {
 	// Update the file meta
 	err = UpdateFileMeta(path, FileMeta{
 		UploadedAt: time.Now().Unix(),
+		MimeType:   mimeTypeStr,
 	})
 	if err != nil {
 		return err
