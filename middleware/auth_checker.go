@@ -18,7 +18,13 @@ const (
 // AuthChecker Ensures the request is authenticated
 func AuthChecker() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		currentPath := c.Request.URL.Path
+		currentPath := c.Request.URL.Path  // The current path
+		rawQuery := c.Request.URL.RawQuery // The raw query
+
+		if rawQuery != "" {
+			currentPath += "?" + rawQuery // Append the raw query to the current path
+		}
+
 		method := c.Request.Method
 
 		// Get the token from the query first, because the query has higher priority
