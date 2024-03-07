@@ -13,7 +13,7 @@ import (
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes(router *gin.RouterGroup) {
-	onlyOffice := router.Group("/meta", middleware.AuthChecker(), middleware.FilePathChecker())
+	onlyOffice := router.Group("/meta", middleware.FilePathChecker())
 	{
 		// Register the routes
 		onlyOffice.GET("/*rpath", routeGetFileMeta)

@@ -38,8 +38,13 @@ type FileInfo struct {
 	FileMeta FileMeta `json:"fileMeta"` // The metadata of the file
 }
 
-// convertToFsPath converts the absolute path provided to the real file system path
-func convertToFsPath(path string) (string, error) {
+// IsImage checks if the file is an image
+func (f *FileInfo) IsImage() bool {
+	return strings.HasPrefix(f.FileMeta.MimeType, "image/")
+}
+
+// ConvertToFsPath converts the absolute path provided to the real file system path
+func ConvertToFsPath(path string) (string, error) {
 	basePath := util.GetBasePath()
 	if !strings.HasPrefix(path, basePath) {
 		return "", errors.New("invalid path")
@@ -65,7 +70,7 @@ func convertToFsPath(path string) (string, error) {
 
 // GetFileInfo returns the file information for the file at the provided path
 func GetFileInfo(path string) (FileInfo, error) {
-	fsPath, err := convertToFsPath(path)
+	fsPath, err := ConvertToFsPath(path)
 	if err != nil {
 		return FileInfo{}, err
 	}
@@ -99,7 +104,7 @@ func GetFileInfo(path string) (FileInfo, error) {
 
 // GetFileReader returns a reader for the file at the provided path, need to close the file after use
 func GetFileReader(path string) (*os.File, error) {
-	fsPath, err := convertToFsPath(path)
+	fsPath, err := ConvertToFsPath(path)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +121,7 @@ func GetFileReader(path string) (*os.File, error) {
 
 // GetFileMeta returns the file metadata for the file at the provided path
 func GetFileMeta(path string) FileMeta {
-	fsPath, err := convertToFsPath(path)
+	fsPath, err := ConvertToFsPath(path)
 	if err != nil {
 		return FileMeta{}
 	}
@@ -183,7 +188,7 @@ func UpdateFileMeta(path string, fileMeta FileMeta) error {
 	}
 
 	// Save the new file metadata
-	fsPath, err := convertToFsPath(path)
+	fsPath, err := ConvertToFsPath(path)
 	if err != nil {
 		return err
 	}
@@ -216,7 +221,7 @@ func UpdateFileMeta(path string, fileMeta FileMeta) error {
 
 // DeleteFile deletes the file at the provided path
 func DeleteFile(path string) error {
-	fsPath, err := convertToFsPath(path)
+	fsPath, err := ConvertToFsPath(path)
 	if err != nil {
 		return err
 	}

@@ -18,7 +18,7 @@ func GetTempFileWriteStream(path string) (*os.File, error) {
 	uploadPath := util.GetUploadPath()
 	canCreateFolder := config.GofletCfg.FileConfig.AllowFolderCreation
 
-	fsPath, err := convertToFsPath(path)
+	fsPath, err := ConvertToFsPath(path)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func CompleteFileUpload(path string) error {
 	uploadPath := util.GetUploadPath()
 	canCreateFolder := config.GofletCfg.FileConfig.AllowFolderCreation
 
-	fsPath_, err := convertToFsPath(path)
+	fsPath_, err := ConvertToFsPath(path)
 	if err != nil {
 		return err
 	}

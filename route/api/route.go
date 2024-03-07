@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
+	"goflet/route/api/image"
 	"goflet/route/api/meta"
 	"goflet/route/api/onlyoffice"
 )
@@ -13,5 +14,6 @@ func RegisterRoutes(router *gin.Engine) {
 	{
 		onlyoffice.RegisterRoutes(api)
 		meta.RegisterRoutes(api)
+		image.RegisterRoutes(api)
 	}
 }
