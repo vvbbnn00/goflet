@@ -14,13 +14,13 @@ import (
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes(router *gin.Engine) {
-	v1 := router.Group("/file", middleware.AuthChecker(), middleware.FilePathChecker())
+	file := router.Group("/file", middleware.AuthChecker(), middleware.FilePathChecker())
 	{
 		// Register the routes
-		v1.GET("/*rpath", routeGetFile)
-		v1.PUT("/*rpath", routePutFile)
-		v1.POST("/*rpath", routePostFile)
-		v1.DELETE("/*rpath", routeDeleteFile)
+		file.GET("/*rpath", routeGetFile)
+		file.PUT("/*rpath", routePutFile)
+		file.POST("/*rpath", routePostFile)
+		file.DELETE("/*rpath", routeDeleteFile)
 	}
 }
 

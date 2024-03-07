@@ -11,10 +11,10 @@ import (
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes(router *gin.Engine) {
-	v1 := router.Group("/onlyoffice", middleware.AuthChecker(), middleware.FilePathChecker())
+	onlyOffice := router.Group("/onlyoffice", middleware.AuthChecker(), middleware.FilePathChecker())
 	{
 		// Register the routes
-		v1.POST("/*rpath", routeUpdateFile)
+		onlyOffice.POST("/*rpath", routeUpdateFile)
 	}
 }
 
