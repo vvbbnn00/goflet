@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-const metaAppend = ".meta"
-const fileMetaCachePrefix = "file_meta_"
+const MetaAppend = ".meta"
+const FileMetaCachePrefix = "file_meta_"
 
 type FileHash struct {
 	HashSha1   string `json:"sha1"`
@@ -115,11 +115,11 @@ func GetFileMeta(path string) FileMeta {
 		return FileMeta{}
 	}
 
-	metaFilePath := fsPath + metaAppend
+	metaFilePath := fsPath + MetaAppend
 
 	// Check if the file metadata is cached
 	c := cache.GetCache()
-	cacheKey := fileMetaCachePrefix + metaFilePath
+	cacheKey := FileMetaCachePrefix + metaFilePath
 
 	cachedMeta, err := c.GetString(cacheKey)
 	if err == nil {
@@ -179,7 +179,7 @@ func UpdateFileMeta(path string, fileMeta FileMeta) error {
 		return err
 	}
 
-	metaFilePath := fsPath + metaAppend
+	metaFilePath := fsPath + MetaAppend
 	metaFile, err := os.OpenFile(metaFilePath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -196,7 +196,7 @@ func UpdateFileMeta(path string, fileMeta FileMeta) error {
 	// Cache the file metadata
 	go func() {
 		c := cache.GetCache()
-		cacheKey := fileMetaCachePrefix + metaFilePath
+		cacheKey := FileMetaCachePrefix + metaFilePath
 		metaFileString := strings.Builder{}
 		_ = gob.NewEncoder(&metaFileString).Encode(fileMeta)
 		_ = c.Set(cacheKey, metaFileString.String())
@@ -224,14 +224,14 @@ func DeleteFile(path string) error {
 	}
 
 	// Delete the meta file
-	metaFilePath := fsPath + metaAppend
+	metaFilePath := fsPath + MetaAppend
 
 	_ = os.Remove(metaFilePath)
 
 	// Delete the file metadata cache
 	go func() {
 		c := cache.GetCache()
-		cacheKey := fileMetaCachePrefix + metaFilePath
+		cacheKey := FileMetaCachePrefix + metaFilePath
 		_ = c.Del(cacheKey)
 	}()
 

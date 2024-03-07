@@ -95,14 +95,7 @@ func CompleteFileUpload(path string) error {
 
 	// Update the file hash
 	go func() {
-		fileHash := HashFile(fsPath_)
-		err := UpdateFileMeta(path, FileMeta{
-			Hash: fileHash,
-		})
-		if err != nil {
-			log.Printf("Error updating file meta: %s", err.Error())
-			return
-		}
+		HashFileAsync(fsPath_, path)
 	}()
 
 	return nil

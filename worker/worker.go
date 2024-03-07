@@ -38,6 +38,7 @@ type Pool struct {
 // work starts the worker and listens for jobs
 func (w *Worker) work(jobChain chan Job, cancelChain <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
+	log.Printf("[Worker] Worker for job %s started", w.JobName)
 
 	for {
 		select {
