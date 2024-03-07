@@ -1,7 +1,6 @@
-package test
+package cache
 
 import (
-	"goflet/cache"
 	"goflet/config"
 	"log"
 	"testing"
@@ -18,14 +17,14 @@ func init() {
 }
 
 func TestGetCache(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	if c == nil {
 		t.Errorf("The cache instance should not be nil.")
 	}
 }
 
 func TestSet(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	// Set integer
 	err := c.Set("integer", 1)
 	if err != nil {
@@ -49,7 +48,7 @@ func TestSet(t *testing.T) {
 }
 
 func TestGetInt(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	actual, err := c.GetInt("integer")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -60,7 +59,7 @@ func TestGetInt(t *testing.T) {
 }
 
 func TestGetFloat(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	actual, err := c.GetFloat("float")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -71,7 +70,7 @@ func TestGetFloat(t *testing.T) {
 }
 
 func TestGetBool(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	actual, err := c.GetBool("boolean")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -82,7 +81,7 @@ func TestGetBool(t *testing.T) {
 }
 
 func TestGetString(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	actual, err := c.GetString("string")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -93,7 +92,7 @@ func TestGetString(t *testing.T) {
 }
 
 func TestExists(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	exists, err := c.Exists("integer")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -109,7 +108,7 @@ func TestExists(t *testing.T) {
 }
 
 func TestDel(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	err := c.Del("integer")
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -121,7 +120,7 @@ func TestDel(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	err := c.Clear()
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -133,7 +132,7 @@ func TestClear(t *testing.T) {
 }
 
 func TestRefreshTTL(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	err := c.SetEx("integer", 1, 1)
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -150,7 +149,7 @@ func TestRefreshTTL(t *testing.T) {
 }
 
 func TestSetEx(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	err := c.SetEx("integer", 1, 1)
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -163,7 +162,7 @@ func TestSetEx(t *testing.T) {
 }
 
 func TestGarbageCollection(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	err := c.SetEx("integer", 1, 1)
 	if err != nil {
 		t.Errorf("The error should be nil, but got %v.", err)
@@ -176,7 +175,7 @@ func TestGarbageCollection(t *testing.T) {
 }
 
 func TestManyEntries(t *testing.T) {
-	c := cache.GetCache()
+	c := GetCache()
 	for i := 0; i < 20; i++ {
 		err := c.SetEx(string(rune(i)), i, 0)
 		if err != nil {

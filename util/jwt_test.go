@@ -1,8 +1,7 @@
-package test
+package util
 
 import (
 	"goflet/config"
-	"goflet/util"
 	"testing"
 )
 
@@ -10,16 +9,16 @@ func TestNone(t *testing.T) {
 	tokenString := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ."
 
 	config.GofletCfg.JWTConfig.Algorithm = "none"
-	util.JwtInit()
+	JwtInit()
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("None Algorithm should not be supported")
 	}
 }
 
 func doTest(t *testing.T, tokenString string) {
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +30,7 @@ func TestHS256(t *testing.T) {
 
 	config.GofletCfg.JWTConfig.Algorithm = "HS256"
 	config.GofletCfg.JWTConfig.Security.SigningKey = key
-	util.JwtInit()
+	JwtInit()
 
 	doTest(t, tokenString)
 }
@@ -50,7 +49,7 @@ mwIDAQAB
 
 	config.GofletCfg.JWTConfig.Algorithm = "RS256"
 	config.GofletCfg.JWTConfig.Security.PublicKey = publicKey
-	util.JwtInit()
+	JwtInit()
 
 	doTest(t, tokenString)
 }
@@ -64,7 +63,7 @@ q9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==
 
 	config.GofletCfg.JWTConfig.Algorithm = "ES256"
 	config.GofletCfg.JWTConfig.Security.PublicKey = publicKey
-	util.JwtInit()
+	JwtInit()
 
 	doTest(t, tokenString)
 }
@@ -83,7 +82,7 @@ mwIDAQAB
 
 	config.GofletCfg.JWTConfig.Algorithm = "PS256"
 	config.GofletCfg.JWTConfig.Security.PublicKey = publicKey
-	util.JwtInit()
+	JwtInit()
 
 	doTest(t, tokenString)
 }
@@ -91,14 +90,14 @@ mwIDAQAB
 func prepareForHS256() {
 	config.GofletCfg.JWTConfig.Algorithm = "HS256"
 	config.GofletCfg.JWTConfig.Security.SigningKey = "your-256-bit-secret"
-	util.JwtInit()
+	JwtInit()
 }
 
 func TestInvalidAlgorithm(t *testing.T) {
 	prepareForHS256()
 	tokenString := "eyJhbGciOiJIUzExNDUxNCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("Invalid algorithm should not be supported")
 	}
@@ -108,7 +107,7 @@ func TestInvalidToken(t *testing.T) {
 	prepareForHS256()
 	tokenString := "123456"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("Invalid token should not be supported")
 	}
@@ -118,7 +117,7 @@ func TestInvalidKey(t *testing.T) {
 	prepareForHS256()
 	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.EbVePZ7UuIHAYoyyH5KNBXVMnezJl8ut9Scx5XA42vc"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("Invalid key should not be supported")
 	}
@@ -128,7 +127,7 @@ func TestBeforeNbf(t *testing.T) {
 	prepareForHS256()
 	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjo5OTk5OTk5OTk5fQ.HCxJ2E1Km6BM5EHMptURfFGqDLh4BbymYSfem-mdqvo"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("Before nbf should not be supported")
 	}
@@ -138,7 +137,7 @@ func TestAfterExp(t *testing.T) {
 	prepareForHS256()
 	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxMTQ1MTQxOTE5fQ.unr6-gTptTt4HskE_NWK4vvd8jZqFZU6SMmScOuTFt4"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("After exp should not be supported")
 	}
@@ -150,7 +149,7 @@ func TestValidIssuer(t *testing.T) {
 
 	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaXNzIjoiaXNzdWVyIn0.RY_M5zJMCCj1r4u6KV9fK3NCY5ubIctKON9fhFG63K8"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -162,7 +161,7 @@ func TestInvalidIssuer(t *testing.T) {
 
 	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaXNzIjoiVGFkb2tvcm8ifQ.GCRVtomcBEahfueDXIIn51U8rnwI86VgIQadQz2Od1c"
 
-	_, err := util.ParseJwtToken(tokenString)
+	_, err := ParseJwtToken(tokenString)
 	if err == nil {
 		t.Fatal("Invalid issuer should not be supported")
 	}
