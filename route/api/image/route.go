@@ -5,9 +5,11 @@ import (
 	"goflet/middleware"
 	"goflet/service"
 	"goflet/service/image"
+	"goflet/util"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 const (
@@ -51,11 +53,30 @@ func routeGetImage(c *gin.Context) {
 	// Check if the file is in the cache
 	cachedFile, err := image.GetFileImageReader(cleanPath, params)
 	if err == nil {
+		fileStat, _ := cachedFile.Stat()
+		if fileStat.Size() == 0 {
+			_ = cachedFile.Close()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
+			return
+		}
+
+		// Check if the file has been modified
+		ifModifiedSince, err := util.HeaderDateToInt64(c.GetHeader("If-Modified-Since"))
+		if err == nil {
+			if fileStat.ModTime().Unix() <= ifModifiedSince {
+				c.Status(http.StatusNotModified)
+				return
+			}
+		}
+
 		defer func() {
 			_ = cachedFile.Close()
 		}()
 		// Set the content type
 		c.Header("Content-Type", "image/"+string(params.Format))
+		c.Header("Content-Length", strconv.FormatInt(fileStat.Size(), 10))
+		// Add the cache header
+		c.Header("Last-Modified", fileStat.ModTime().UTC().Format(http.TimeFormat))
 		c.Header("X-Cache", "HIT")
 		// Copy the file to the response
 		_, _ = io.Copy(c.Writer, cachedFile)
@@ -81,6 +102,8 @@ func routeGetImage(c *gin.Context) {
 
 	// Set the content type
 	c.Header("Content-Type", "image/"+string(params.Format))
+	c.Header("Content-Length", strconv.Itoa(imageProcessed.Len()))
+	c.Header("Last-Modified", util.Int64ToHeaderDate(fileInfo.LastModified))
 	c.Header("X-Cache", "MISS")
 
 	// Save the file to the cache
