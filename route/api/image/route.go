@@ -52,14 +52,11 @@ func routeGetImage(c *gin.Context) {
 
 	// Check if the file is in the cache
 	cachedFile, err := image.GetFileImageReader(cleanPath, params)
-	if err == nil {
-		fileStat, _ := cachedFile.Stat()
-		if fileStat.Size() == 0 {
-			_ = cachedFile.Close()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
-			return
-		}
-
+	fileStat, _ := cachedFile.Stat()
+	if err == nil && fileStat.Size() == 0 {
+		_ = cachedFile.Close()
+	}
+	if err == nil && fileStat.Size() > 0 {
 		// Check if the file has been modified
 		ifModifiedSince, err := util.HeaderDateToInt64(c.GetHeader("If-Modified-Since"))
 		if err == nil {

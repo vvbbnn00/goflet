@@ -3,6 +3,7 @@ package image
 import (
 	"bytes"
 	"goflet/service"
+	"io"
 	"os"
 )
 
@@ -39,17 +40,21 @@ func SaveFileImageCache(path string, params *ProcessParams, buffer bytes.Buffer)
 	// Copy the file to the cache
 	cacheFile, err := os.OpenFile(fsPath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
+		_ = cacheFile.Close()
 		return err
 	}
 
 	// Write the buffer to the file
-	_, err = cacheFile.Write(buffer.Bytes())
+	_, err = io.Copy(cacheFile, &buffer)
 	if err != nil {
+		_ = cacheFile.Close()
 		return err
 	}
 
 	// Close the file
 	_ = cacheFile.Close()
+
+	println("File saved to cache: " + fsPath)
 
 	return nil
 }
