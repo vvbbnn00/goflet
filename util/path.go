@@ -73,14 +73,16 @@ func ClarifyPath(path string) (string, error) {
 	return cleanPath, nil
 }
 
-// MatchPath Match the path with the paths
-func MatchPath(path string, paths []string) bool {
-	for _, p := range paths {
-		if match, _ := filepath.Match(p, path); match {
-			return true
-		}
+// Match the pattern with the name
+func Match(pattern, name string) bool {
+	// If it has no *, just compare the strings
+	if !strings.Contains(pattern, "*") {
+		return pattern == name
 	}
-	return false
+
+	// Split the pattern by *
+	parts := strings.Split(pattern, "*")
+	return strings.HasPrefix(name, parts[0]) // Only compare the first part
 }
 
 // MatchMethod Match the method with the methods

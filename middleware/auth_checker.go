@@ -3,10 +3,8 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/util"
-	"log"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 )
 
@@ -67,16 +65,6 @@ func parseToken(tokenString string) (*util.JwtClaims, error) {
 	return nil, err
 }
 
-// methodMatch Check if the method is in the list of methods
-func methodMatch(methods []string, method string) bool {
-	for _, m := range methods {
-		if m == method {
-			return true
-		}
-	}
-	return false
-}
-
 // queryMatch Check if the query matches the permission query
 func queryMatch(query url.Values, permQuery map[string]string) bool {
 	for k, v := range permQuery {
@@ -94,14 +82,10 @@ func isAuthorized(c *gin.Context, permissions []util.Permission) bool {
 
 	for _, perm := range permissions {
 		// Check if the path matches
-		match, err := path.Match(perm.Path, currentPath)
-		if err != nil {
-			log.Printf("Bad pattern: %s", perm.Path)
-			continue
-		}
+		match := util.Match(currentPath, perm.Path)
 		// Check if the method matches
 		if match || perm.Path == "*" {
-			return methodMatch(perm.Methods, method) && queryMatch(c.Request.URL.Query(), perm.Query)
+			return util.MatchMethod(method, perm.Methods) && queryMatch(c.Request.URL.Query(), perm.Query)
 		}
 	}
 
