@@ -114,5 +114,40 @@ func CompleteFileUpload(path string) error {
 		HashFileAsync(fsPath_, path)
 	}()
 
+	// Remove image cache ending with .image_*
+	go func() {
+		err := removeImageCache(path)
+		if err != nil {
+			log.Printf("Error removing image cache: %s", err.Error())
+		}
+	}()
+
+	return nil
+}
+
+// removeImageCache remove the image cache
+func removeImageCache(path string) error {
+	fsPath, err := ConvertToFsPath(path)
+	if err != nil {
+		return err
+	}
+
+	// Remove the file from the cache
+	pathPattern := fsPath + ".image_*"
+	println(err, pathPattern)
+	files, err := filepath.Glob(pathPattern)
+
+	if err != nil {
+		return err
+	}
+
+	// Remove the files
+	for _, file := range files {
+		err = os.Remove(file)
+		if err != nil {
+			continue
+		}
+	}
+
 	return nil
 }
