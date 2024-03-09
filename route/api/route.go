@@ -1,7 +1,9 @@
+// Package api provides the routes for the API
 package api
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/middleware"
 	"github.com/vvbbnn00/goflet/route/api/image"
 	"github.com/vvbbnn00/goflet/route/api/meta"

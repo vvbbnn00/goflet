@@ -1,15 +1,18 @@
+// Package route provides the routes for the application
 package route
 
 import (
+	"io"
+	"os"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/middleware"
 	"github.com/vvbbnn00/goflet/route/api"
 	"github.com/vvbbnn00/goflet/route/file"
-	"io"
-	"os"
-	"time"
 )
 
 // RegisterRoutes load all the enabled routes for the application

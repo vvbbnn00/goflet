@@ -1,5 +1,7 @@
+// Package model provides the model for the cache
 package model
 
+// ValueType is the type of the value
 type ValueType int
 
 const (
@@ -15,9 +17,11 @@ const (
 	ValueArray
 	// ValueMap is the map value type
 	ValueMap
+	// ValueUnknown is the unknown value type
 	ValueUnknown = -1
 )
 
+// Cache is the interface for the cache
 type Cache interface {
 	// GetInt returns the integer value from the cache
 	GetInt(key string) (int, error)
@@ -49,20 +53,26 @@ type Cache interface {
 	RefreshTTL(key string, ttl int) error
 }
 
+// ErrCacheMiss is the error for cache miss
 type ErrCacheMiss struct{}
 
+// Error returns the error message
 func (m *ErrCacheMiss) Error() string {
 	return "cache: key not found"
 }
 
+// ErrInvalidValueType is the error for invalid value type
 type ErrInvalidValueType struct{}
 
+// Error returns the error message
 func (m *ErrInvalidValueType) Error() string {
 	return "cache: invalid value type"
 }
 
+// ErrTypeMismatch is the error for type mismatch
 type ErrTypeMismatch struct{}
 
+// Error returns the error message
 func (m *ErrTypeMismatch) Error() string {
 	return "cache: type mismatch"
 }

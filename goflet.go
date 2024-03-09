@@ -1,10 +1,11 @@
+// Package main provides the entry point for the application
 package main
 
 import (
 	"github.com/vvbbnn00/goflet/base"
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/route"
-	"github.com/vvbbnn00/goflet/scheduled_task"
+	"github.com/vvbbnn00/goflet/task"
 	"github.com/vvbbnn00/goflet/util/log"
 )
 
@@ -36,7 +37,7 @@ func main() {
 		}()
 	}
 
-	scheduled_task.RunScheduledTask()
+	task.RunScheduledTask()
 
 	// Wait for keyboard interrupt to stop the servers
 	select {}

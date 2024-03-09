@@ -1,3 +1,4 @@
+// Package base provides the base information for the application
 package base
 
 import (
@@ -5,6 +6,7 @@ import (
 	"runtime/debug"
 )
 
+// Version The version of the application
 var Version = "unknown"
 
 func init() {

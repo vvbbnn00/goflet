@@ -1,3 +1,4 @@
+// Package base58 provides base58 encoding and decoding functions.
 package base58
 
 import (
@@ -9,7 +10,7 @@ const base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwx
 
 // Encode encodes a byte slice to a base58 encoded string
 func Encode(input []byte) string {
-	var result []byte
+	result := make([]byte, 0, len(input)*136/100)
 	x := big.NewInt(0).SetBytes(input)
 	base := big.NewInt(int64(len(base58Alphabet)))
 	zero := big.NewInt(0)

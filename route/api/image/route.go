@@ -1,7 +1,13 @@
+// Package image provides the routes for the image API
 package image
 
 import (
+	"io"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/middleware"
 	"github.com/vvbbnn00/goflet/route/file"
@@ -9,9 +15,6 @@ import (
 	"github.com/vvbbnn00/goflet/storage/image"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/log"
-	"io"
-	"net/http"
-	"strconv"
 )
 
 // RegisterRoutes load all the enabled routes for the application
@@ -107,5 +110,4 @@ func routeGetImage(c *gin.Context) {
 
 	// Copy the file to the response
 	_, _ = io.Copy(c.Writer, imageProcessed)
-
 }

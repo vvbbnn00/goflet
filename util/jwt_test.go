@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/vvbbnn00/goflet/config"
 	"testing"
+
+	"github.com/vvbbnn00/goflet/config"
 )
 
 func TestNone(t *testing.T) {

@@ -1,10 +1,11 @@
 package cache
 
 import (
-	"github.com/vvbbnn00/goflet/config"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/vvbbnn00/goflet/config"
 )
 
 // init initializes the configuration

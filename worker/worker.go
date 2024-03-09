@@ -1,14 +1,16 @@
+// Package worker provides a pool of workers to execute jobs
 package worker
 
 import (
-	"github.com/vvbbnn00/goflet/util/log"
 	"sync"
 	"time"
+
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 const (
 	maxJobRetries    = 3 // Maximum number of retries for a job
-	NoPoolBufferSize = 0 // No buffer for the job chain
+	noPoolBufferSize = 0 // No buffer for the job chain
 )
 
 const retryDelay = 1 * time.Second // Delay before retrying a job
@@ -98,7 +100,7 @@ func NewPool(workerCount int, jobQueueSize int, workerFactory func() Worker) *Po
 		panic("Invalid worker count")
 	}
 	var jobChain chan Job
-	if jobQueueSize == NoPoolBufferSize {
+	if jobQueueSize == noPoolBufferSize {
 		jobChain = make(chan Job)
 	} else {
 		jobChain = make(chan Job, jobQueueSize)

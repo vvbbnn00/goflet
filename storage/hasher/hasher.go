@@ -1,12 +1,14 @@
+// Package hasher provides a simple interface to hash files and update the hash of the file in the database.
 package hasher
 
 import (
+	"path/filepath"
+
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/storage/model"
 	"github.com/vvbbnn00/goflet/util/hash"
 	"github.com/vvbbnn00/goflet/util/log"
 	"github.com/vvbbnn00/goflet/worker"
-	"path/filepath"
 )
 
 const (

@@ -2,12 +2,13 @@ package image
 
 import (
 	"bytes"
-	"github.com/vvbbnn00/goflet/storage"
-	"github.com/vvbbnn00/goflet/storage/model"
-	"github.com/vvbbnn00/goflet/util/log"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/storage/model"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // GetFileImageInfo get the file info for the image

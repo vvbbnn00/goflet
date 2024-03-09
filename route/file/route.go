@@ -1,14 +1,17 @@
+// Package file provides the routes for the file package
 package file
 
 import (
+	"io"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/middleware"
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/storage/upload"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/log"
-	"io"
-	"net/http"
 )
 
 // RegisterRoutes load all the enabled routes for the application

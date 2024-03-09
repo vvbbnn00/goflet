@@ -2,10 +2,11 @@ package util
 
 import (
 	"errors"
-	"github.com/vvbbnn00/goflet/config"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/vvbbnn00/goflet/config"
 )
 
 // GetPath Get the absolute path for the file storage
@@ -52,7 +53,7 @@ func ClarifyPath(path string) (string, error) {
 	}
 
 	//// Check if the path contains unsupported characters
-	//if strings.Contains(path, ":") {
+	// if strings.Contains(path, ":") {
 	//	return "", errors.New("path contains unsupported characters")
 	//}
 

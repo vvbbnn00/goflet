@@ -1,7 +1,8 @@
+// Package cache provides the cache for the application
 package cache
 
 import (
-	"github.com/vvbbnn00/goflet/cache/memory_cache"
+	"github.com/vvbbnn00/goflet/cache/memory"
 	"github.com/vvbbnn00/goflet/cache/model"
 	"github.com/vvbbnn00/goflet/config"
 )
@@ -13,7 +14,7 @@ func initConfig() {
 	cacheType := config.GofletCfg.CacheConfig.CacheType
 	switch cacheType {
 	case config.CacheTypeMemory:
-		gCache = memory_cache.NewMemoryCache(config.GofletCfg.CacheConfig.MemoryCache.MaxEntries, config.GofletCfg.CacheConfig.MemoryCache.DefaultTTL)
+		gCache = memory.NewMemoryCache(config.GofletCfg.CacheConfig.MemoryCache.MaxEntries, config.GofletCfg.CacheConfig.MemoryCache.DefaultTTL)
 	default:
 		panic("Unknown cache type, please check the configuration")
 	}

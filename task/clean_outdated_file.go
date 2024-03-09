@@ -1,13 +1,14 @@
-package scheduled_task
+package task
 
 import (
-	"github.com/vvbbnn00/goflet/config"
-	"github.com/vvbbnn00/goflet/util"
-	"github.com/vvbbnn00/goflet/util/log"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/vvbbnn00/goflet/config"
+	"github.com/vvbbnn00/goflet/util"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // CleanOutdatedFile Clean outdated files

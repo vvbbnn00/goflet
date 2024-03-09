@@ -1,11 +1,13 @@
+// Package util provides utility functions for the application
 package util
 
 import (
 	"errors"
-	"github.com/vvbbnn00/goflet/config"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/vvbbnn00/goflet/config"
 )
 
 // HeaderParseRangeUpload Parse the range header and return the start and end
@@ -120,17 +122,15 @@ func HeaderParseRangeDownload(rangeHeader string, fileSize int64) (start int64, 
 		if err != nil {
 			return 0, 0, errors.New("invalid start value")
 		}
-	} else {
+	} else if rangeParts[1] != "" {
 		// If the start part is empty, parse the end part as the last N bytes
-		if rangeParts[1] != "" {
-			lastN, err := strconv.ParseInt(rangeParts[1], 10, 64)
-			if err != nil {
-				return 0, 0, errors.New("invalid end value")
-			}
-			start = fileSize - lastN
-			end = fileSize - 1
-			return start, end, nil
+		lastN, err := strconv.ParseInt(rangeParts[1], 10, 64)
+		if err != nil {
+			return 0, 0, errors.New("invalid end value")
 		}
+		start = fileSize - lastN
+		end = fileSize - 1
+		return start, end, nil
 	}
 
 	// Parse the end part

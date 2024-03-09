@@ -1,28 +1,40 @@
 package image
 
 import (
-	"github.com/vvbbnn00/goflet/config"
-	"github.com/vvbbnn00/goflet/util/log"
 	"net/url"
 	"strconv"
+
+	"github.com/vvbbnn00/goflet/config"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
+// ScaleType the type of the scale
 type ScaleType int
+
+// PictureFormat the format of the picture
 type PictureFormat string
 
 const (
+	// ScaleTypeFit The fit scale type
 	ScaleTypeFit ScaleType = iota
+	// ScaleTypeFill The fill scale type
 	ScaleTypeFill
+	// ScaleTypeResize The resize scale type
 	ScaleTypeResize
+	// ScaleTypeFitWidth The fit width scale type
 	ScaleTypeFitWidth
+	// ScaleTypeFitHeight The fit height scale type
 	ScaleTypeFitHeight
 )
 
 const (
+	// PictureFormatJpeg The jpeg picture format
 	PictureFormatJpeg PictureFormat = "jpeg"
-	PictureFormatPng  PictureFormat = "png"
-	PictureFormatGif  PictureFormat = "gif"
-	//PictureFormatWebp PictureFormat = "webp"
+	// PictureFormatPng The png picture format
+	PictureFormatPng PictureFormat = "png"
+	// PictureFormatGif The gif picture format
+	PictureFormatGif PictureFormat = "gif"
+	// PictureFormatWebp PictureFormat = "webp"
 )
 
 // ProcessParams the parameters for processing the image
@@ -106,7 +118,7 @@ func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
 	}
 	if angle := query.Get("a"); angle != "" {
 		params.Angle, _ = strconv.Atoi(angle)
-		params.Angle = params.Angle % 360
+		params.Angle %= 360
 	}
 	if format := query.Get("f"); format != "" {
 		switch format {
@@ -116,7 +128,7 @@ func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
 			params.Format = PictureFormatPng
 		case "gif":
 			params.Format = PictureFormatGif
-		//case "webp":
+		// case "webp":
 		//	params.Format = PictureFormatWebp
 		default:
 			params.Format = PictureFormat(conf.DefaultFormat)

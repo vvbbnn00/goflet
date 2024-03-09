@@ -1,8 +1,8 @@
+// Package log provides a simple logging utility for the application.
 package log
 
 import (
 	"fmt"
-	"github.com/vvbbnn00/goflet/config"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,6 +10,8 @@ import (
 	"runtime/debug"
 	"strings"
 	"time"
+
+	"github.com/vvbbnn00/goflet/config"
 )
 
 var (
@@ -20,13 +22,19 @@ var (
 var basePath string
 var sepReplace bool
 
+// Level The log level
 type Level int
 
 const (
+	// DebugLevel The debug level
 	DebugLevel Level = iota
+	// InfoLevel The info level
 	InfoLevel
+	// WarnLevel The warn level
 	WarnLevel
+	// ErrorLevel The error level
 	ErrorLevel
+	// FatalLevel The fatal level
 	FatalLevel
 )
 
@@ -107,6 +115,7 @@ func printf(lvl Level, format string, v ...interface{}) {
 	}
 }
 
+// RawPrintf prints the message without any formatting
 func RawPrintf(format string, v ...interface{}) {
 	if !enabled || level > InfoLevel {
 		return
@@ -114,48 +123,57 @@ func RawPrintf(format string, v ...interface{}) {
 	fmt.Printf(format, v...)
 }
 
-func Debug(msg string) func(string, ...interface{}) {
-	return func(s string, i ...interface{}) {
-		printf(DebugLevel, s, i)
-	}
+// Debug prints the debug message
+func Debug(msg string) {
+	printf(DebugLevel, msg)
 }
 
+// Info prints the info message
 func Info(msg string) {
 	printf(InfoLevel, msg)
 }
 
+// Warn prints the warn message
 func Warn(msg string) {
 	printf(WarnLevel, msg)
 }
 
+// Error prints the error message
 func Error(msg string) {
 	printf(ErrorLevel, msg)
 }
 
+// Fatal prints the fatal message
 func Fatal(msg string) {
 	printf(FatalLevel, msg)
 }
 
+// Debugf prints the debug message with the format
 func Debugf(format string, v ...interface{}) {
 	printf(DebugLevel, format, v...)
 }
 
+// Infof prints the info message with the format
 func Infof(format string, v ...interface{}) {
 	printf(InfoLevel, format, v...)
 }
 
+// Warnf prints the warn message with the format
 func Warnf(format string, v ...interface{}) {
 	printf(WarnLevel, format, v...)
 }
 
+// Errorf prints the error message with the format
 func Errorf(format string, v ...interface{}) {
 	printf(ErrorLevel, format, v...)
 }
 
+// Fatalf prints the fatal message with the format
 func Fatalf(format string, v ...interface{}) {
 	printf(FatalLevel, format, v...)
 }
 
+// Printf prints the message with the format
 func Printf(format string, v ...interface{}) {
 	Infof(format, v...)
 }

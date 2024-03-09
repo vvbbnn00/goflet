@@ -39,19 +39,16 @@ func TestWorkerPoolStop(t *testing.T) {
 	pool.Stop()
 
 	// Check if the job channel is closed.
-	select {
-	case job, ok := <-pool.JobChain:
-		if ok {
-			print(job.RetryCount, job.Args)
-			t.Error("Job channel is not closed")
-		}
+	job, ok := <-pool.JobChain
+	if ok {
+		print(job.RetryCount, job.Args)
+		t.Error("Job channel is not closed")
 	}
 
 	// Check if the cancel channel is closed.
-	select {
-	case _, ok := <-pool.CancelChain:
-		if ok {
-			t.Error("Cancel channel is not closed")
-		}
+
+	_, ok = <-pool.CancelChain
+	if ok {
+		t.Error("Cancel channel is not closed")
 	}
 }

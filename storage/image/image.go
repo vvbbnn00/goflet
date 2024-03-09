@@ -1,15 +1,18 @@
+// Package image provides image processing functions for the application.
 package image
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/disintegration/imaging"
-	"github.com/nfnt/resize"
-	"github.com/vvbbnn00/goflet/config"
-	"github.com/vvbbnn00/goflet/util/log"
 	"image"
 	"image/color"
 	"os"
+
+	"github.com/disintegration/imaging"
+	"github.com/nfnt/resize"
+	"github.com/pkg/errors"
+
+	"github.com/vvbbnn00/goflet/config"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // ProcessImage process the image with the given parameters
@@ -22,7 +25,7 @@ func ProcessImage(fs *os.File, p *ProcessParams) (*bytes.Buffer, error) {
 
 	width, height := decoded.Bounds().Dx(), decoded.Bounds().Dy()
 	if width > conf.MaxWidth || height > conf.MaxHeight {
-		return nil, fmt.Errorf("image size is too large")
+		return nil, errors.Errorf("image size is too large")
 	}
 
 	// Resize the image
@@ -94,7 +97,7 @@ func rotateImage(img image.Image, angle int) image.Image {
 	if angle%360 == 0 {
 		return img
 	}
-	angle = angle % 360 // Normalize the angle
+	angle %= 360 // Normalize the angle
 	log.Warnf("Rotating the image by %d degrees", angle)
 	return imaging.Rotate(img, float64(angle), color.Transparent)
 }

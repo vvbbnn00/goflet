@@ -1,3 +1,4 @@
+// Package hash provides a simple interface to hash strings and files using various algorithms.
 package hash
 
 import (
@@ -5,9 +6,10 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
-	"golang.org/x/crypto/sha3"
 	"hash"
 	"io"
+
+	"golang.org/x/crypto/sha3"
 )
 
 // prepareHasher prepares the hasher for the algorithm

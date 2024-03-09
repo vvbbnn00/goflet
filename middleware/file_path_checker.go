@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/log"

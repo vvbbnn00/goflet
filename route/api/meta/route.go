@@ -1,13 +1,16 @@
+// Package meta provides the routes for the meta API
 package meta
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/vvbbnn00/goflet/middleware"
-	"github.com/vvbbnn00/goflet/storage"
-	"github.com/vvbbnn00/goflet/util/log"
 	"net/http"
 	"path/filepath"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/vvbbnn00/goflet/middleware"
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // RegisterRoutes load all the enabled routes for the application
@@ -37,7 +40,7 @@ func routeGetFileMeta(c *gin.Context) {
 
 	// If windows, replace \ with /
 	if filepath.Separator == '\\' {
-		fileInfo.FilePath = strings.Replace(fileInfo.FilePath, "\\", "/", -1)
+		fileInfo.FilePath = strings.ReplaceAll(fileInfo.FilePath, "\\", "/")
 	}
 
 	c.JSON(http.StatusOK, fileInfo)

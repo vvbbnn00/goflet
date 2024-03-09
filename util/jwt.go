@@ -2,7 +2,9 @@ package util
 
 import (
 	"errors"
+
 	"github.com/golang-jwt/jwt"
+
 	"github.com/vvbbnn00/goflet/config"
 )
 
@@ -17,6 +19,7 @@ func init() {
 	JwtInit()
 }
 
+// JwtInit Initialize the JWT
 func JwtInit() {
 	conf := config.GofletCfg.JWTConfig
 	alg = conf.Algorithm // The only supported algorithm defined in the configuration
@@ -25,7 +28,10 @@ func JwtInit() {
 	trustedIssuers = conf.TrustedIssuers
 }
 
+// ErrInvalidAlgorithm The error for invalid algorithm
 var ErrInvalidAlgorithm = errors.New("invalid algorithm")
+
+// ErrUnsafeNoneAlgorithm The error for unsafe none algorithm
 var ErrUnsafeNoneAlgorithm = errors.New("none algorithm is not supported for security reasons")
 
 // Permission The permission of the token
@@ -41,6 +47,7 @@ type JwtClaims struct {
 	Permissions []Permission `json:"permissions"` // The permissions of the token
 }
 
+// Valid The function to validate the JWT token
 func (c *JwtClaims) Valid() error {
 	if c.StandardClaims == nil { // Check StandardClaims in case of nil pointer dereference
 		return errors.New("missing required fields")

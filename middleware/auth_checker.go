@@ -1,12 +1,15 @@
+// Package middleware provides the middleware for the application
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/vvbbnn00/goflet/util"
-	"github.com/vvbbnn00/goflet/util/log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/vvbbnn00/goflet/util"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 const (

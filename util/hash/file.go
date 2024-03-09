@@ -1,8 +1,9 @@
 package hash
 
 import (
-	"github.com/vvbbnn00/goflet/storage/model"
 	"os"
+
+	"github.com/vvbbnn00/goflet/storage/model"
 )
 
 // getFs returns the file stream

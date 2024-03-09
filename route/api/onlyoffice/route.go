@@ -1,13 +1,16 @@
+// Package onlyoffice provides the routes for the OnlyOffice API
 package onlyoffice
 
 import (
+	"io"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/middleware"
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/storage/upload"
 	"github.com/vvbbnn00/goflet/util/log"
-	"io"
-	"net/http"
 )
 
 // RegisterRoutes load all the enabled routes for the application
@@ -21,7 +24,7 @@ func RegisterRoutes(router *gin.RouterGroup) {
 
 type onlyOfficeUpdateRequest struct {
 	Status int    `json:"status"` // 2 for update
-	Url    string `json:"url"`    // The URL of the file
+	URL    string `json:"url"`    // The URL of the file
 }
 
 // routeUpdateFile handler for POST /onlyoffice/*path
@@ -58,15 +61,15 @@ func routeUpdateFile(c *gin.Context) {
 	}
 
 	// Download the file from the URL provided by OnlyOffice
-	resp, err := http.Get(o.Url)
+	resp, err := http.Get(o.URL)
 	if err != nil {
 		log.Warnf("Error downloading file: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error downloading file"})
 		return
 	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(resp.Body)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Write the downloaded content to the file
 	_, err = io.Copy(file, resp.Body)

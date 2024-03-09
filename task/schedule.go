@@ -1,9 +1,11 @@
-package scheduled_task
+// Package task provides functions for running scheduled tasks
+package task
 
 import (
+	"reflect"
+
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/util/log"
-	"reflect"
 )
 
 var scheduleToCheck = map[string]func(){

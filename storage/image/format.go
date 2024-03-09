@@ -2,11 +2,12 @@ package image
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+
+	"github.com/pkg/errors"
 )
 
 // convertImageFormat convert the image to the given format
@@ -33,12 +34,12 @@ func convertImageFormat(img image.Image, format PictureFormat, quality int) (*by
 		if err := gif.Encode(&buf, img, nil); err != nil {
 			return nil, err
 		}
-	//case PictureFormatWebp:
+	// case PictureFormatWebp:
 	//	if err := webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: float32(quality)}); err != nil {
 	//		return nil, err
 	//	}
 	default:
-		return nil, fmt.Errorf("unsupported format: %s", format)
+		return nil, errors.Errorf("unsupported format: %s", format)
 	}
 
 	return &buf, nil

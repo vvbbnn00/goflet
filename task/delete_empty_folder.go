@@ -1,11 +1,12 @@
-package scheduled_task
+package task
 
 import (
-	"github.com/vvbbnn00/goflet/util"
-	"github.com/vvbbnn00/goflet/util/log"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/vvbbnn00/goflet/util"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // DeleteEmptyFolder Delete empty folders

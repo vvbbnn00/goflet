@@ -1,3 +1,4 @@
+// Package config provides the configuration for the application
 package config
 
 import (
@@ -8,11 +9,13 @@ import (
 	"strconv"
 )
 
+// PathOfConfig is the path of the configuration file
 const PathOfConfig = "goflet.json"
 
 //go:embed goflet.json
 var defaultConfig string
 
+// CacheType is the type of the cache
 type CacheType string
 
 const (
@@ -20,6 +23,7 @@ const (
 	CacheTypeMemory CacheType = "MemoryCache"
 )
 
+// GofletConfig contains the configuration for the application
 type GofletConfig struct {
 	Debug     bool `json:"debug" default:"false"` // Enable debug mode
 	LogConfig struct {
@@ -105,6 +109,7 @@ func (c *GofletConfig) GetEndpoint() string {
 }
 
 var (
+	// GofletCfg is the configuration for the application
 	GofletCfg GofletConfig
 )
 

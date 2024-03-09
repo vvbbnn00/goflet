@@ -1,17 +1,19 @@
+// Package storage provides functions to interact with the file storage
 package storage
 
 import (
 	"encoding/gob"
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/vvbbnn00/goflet/cache"
 	"github.com/vvbbnn00/goflet/storage/model"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/hash"
 	"github.com/vvbbnn00/goflet/util/log"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 const (

@@ -2,16 +2,18 @@ package file
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/storage/model"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/log"
-	"io"
-	"net/http"
-	"os"
-	"strconv"
 )
 
 // routeGetFile handles GET and HEAD requests for /file/*path

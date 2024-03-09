@@ -1,8 +1,16 @@
+// Package upload provides functions for uploading files to the server
 package upload
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/gabriel-vasile/mimetype"
+
 	"github.com/vvbbnn00/goflet/cache"
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/storage"
@@ -12,11 +20,6 @@ import (
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/hash"
 	"github.com/vvbbnn00/goflet/util/log"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
-	"time"
 )
 
 const (

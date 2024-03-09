@@ -1,11 +1,13 @@
-package memory_cache
+// Package memory provides the memory cache for the application
+package memory
 
 import (
 	"errors"
-	"github.com/vvbbnn00/goflet/cache/model"
 	"reflect"
 	"sync"
 	"time"
+
+	"github.com/vvbbnn00/goflet/cache/model"
 )
 
 const garbageCollectionInterval = 10 * time.Second
@@ -17,7 +19,8 @@ type valueMemory struct {
 	LastAccess time.Time // The last access time, used to determine whether the value is expired
 }
 
-type MemoryCache struct {
+// Cache is the memory cache
+type Cache struct {
 	MaxEntries int // The maximum number of entries to be stored in the cache
 	DefaultTTL int // The default time to live for the cache
 
@@ -55,8 +58,8 @@ func getValueType(value interface{}) model.ValueType {
 }
 
 // NewMemoryCache creates a new memory cache
-func NewMemoryCache(maxEntries, defaultTTL int) *MemoryCache {
-	instance := &MemoryCache{
+func NewMemoryCache(maxEntries, defaultTTL int) *Cache {
+	instance := &Cache{
 		MaxEntries:        maxEntries,
 		DefaultTTL:        defaultTTL,
 		memoryCacheMap:    make(map[string]valueMemory),
@@ -71,7 +74,7 @@ func NewMemoryCache(maxEntries, defaultTTL int) *MemoryCache {
 }
 
 // get returns the value from the memory cache
-func (c *MemoryCache) get(key string) (valueMemory, bool) {
+func (c *Cache) get(key string) (valueMemory, bool) {
 	c.memoryCacheRWLock.RLock()
 	defer c.memoryCacheRWLock.RUnlock()
 
@@ -84,7 +87,7 @@ func (c *MemoryCache) get(key string) (valueMemory, bool) {
 }
 
 // GetInt returns the integer value from the memory cache
-func (c *MemoryCache) GetInt(key string) (int, error) {
+func (c *Cache) GetInt(key string) (int, error) {
 	value, ok := c.get(key)
 	if !ok {
 		return 0, errCacheMiss
@@ -96,7 +99,7 @@ func (c *MemoryCache) GetInt(key string) (int, error) {
 }
 
 // GetString returns the string value from the memory cache
-func (c *MemoryCache) GetString(key string) (string, error) {
+func (c *Cache) GetString(key string) (string, error) {
 	value, ok := c.get(key)
 	if !ok {
 		return "", errCacheMiss
@@ -108,7 +111,7 @@ func (c *MemoryCache) GetString(key string) (string, error) {
 }
 
 // GetFloat returns the float value from the memory cache
-func (c *MemoryCache) GetFloat(key string) (float64, error) {
+func (c *Cache) GetFloat(key string) (float64, error) {
 	value, ok := c.get(key)
 	if !ok {
 		return 0, errCacheMiss
@@ -120,7 +123,7 @@ func (c *MemoryCache) GetFloat(key string) (float64, error) {
 }
 
 // GetBool returns the boolean value from the memory cache
-func (c *MemoryCache) GetBool(key string) (bool, error) {
+func (c *Cache) GetBool(key string) (bool, error) {
 	value, ok := c.get(key)
 	if !ok {
 		return false, errCacheMiss
@@ -132,22 +135,22 @@ func (c *MemoryCache) GetBool(key string) (bool, error) {
 }
 
 // GetArray returns the array value from the memory cache
-func (c *MemoryCache) GetArray(key string) ([]interface{}, error) {
+func (c *Cache) GetArray(_ string) ([]interface{}, error) {
 	return nil, errTypeMismatch // Not implemented
 }
 
 // GetMap returns the map value from the memory cache
-func (c *MemoryCache) GetMap(key string) (map[string]interface{}, error) {
+func (c *Cache) GetMap(_ string) (map[string]interface{}, error) {
 	return nil, errTypeMismatch // Not implemented
 }
 
 // Set sets the value to the memory cache
-func (c *MemoryCache) Set(key string, value interface{}) error {
+func (c *Cache) Set(key string, value interface{}) error {
 	return c.SetEx(key, value, c.DefaultTTL)
 }
 
 // SetEx sets the value to the memory cache with a specific TTL
-func (c *MemoryCache) SetEx(key string, value interface{}, ttl int) error {
+func (c *Cache) SetEx(key string, value interface{}, ttl int) error {
 	valueType := getValueType(value)
 	if valueType == model.ValueUnknown {
 		return errInvalidValueType
@@ -180,7 +183,7 @@ func (c *MemoryCache) SetEx(key string, value interface{}, ttl int) error {
 }
 
 // Del deletes the value from the memory cache
-func (c *MemoryCache) Del(key string) error {
+func (c *Cache) Del(key string) error {
 	c.memoryCacheRWLock.Lock()
 	defer c.memoryCacheRWLock.Unlock()
 
@@ -189,7 +192,7 @@ func (c *MemoryCache) Del(key string) error {
 }
 
 // Exists checks whether the key exists in the memory cache
-func (c *MemoryCache) Exists(key string) (bool, error) {
+func (c *Cache) Exists(key string) (bool, error) {
 	c.memoryCacheRWLock.RLock()
 	defer c.memoryCacheRWLock.RUnlock()
 
@@ -198,7 +201,7 @@ func (c *MemoryCache) Exists(key string) (bool, error) {
 }
 
 // Clear clears the memory cache
-func (c *MemoryCache) Clear() error {
+func (c *Cache) Clear() error {
 	c.memoryCacheRWLock.Lock()
 	defer c.memoryCacheRWLock.Unlock()
 
@@ -207,7 +210,7 @@ func (c *MemoryCache) Clear() error {
 }
 
 // RefreshTTL refreshes the time to live of the key
-func (c *MemoryCache) RefreshTTL(key string, ttl int) error {
+func (c *Cache) RefreshTTL(key string, ttl int) error {
 	c.memoryCacheRWLock.Lock()
 	defer c.memoryCacheRWLock.Unlock()
 
@@ -226,7 +229,7 @@ func (c *MemoryCache) RefreshTTL(key string, ttl int) error {
 }
 
 // garbageCollection performs the garbage collection, checking the expiration of the values
-func (c *MemoryCache) garbageCollection() {
+func (c *Cache) garbageCollection() {
 	ticker := time.NewTicker(garbageCollectionInterval)
 	defer ticker.Stop()
 
@@ -247,7 +250,7 @@ func (c *MemoryCache) garbageCollection() {
 }
 
 // Close stops the garbage collection goroutine and clears the memory cache
-func (c *MemoryCache) Close() {
+func (c *Cache) Close() {
 	close(c.stopGC)
 	_ = c.Clear()
 }
