@@ -80,7 +80,7 @@ func getCallerInfo() string {
 	if ok {
 		relativePath, err := filepath.Rel(basePath, file)
 		if err != nil {
-			return "unknown"
+			return file
 		}
 		if sepReplace {
 			relativePath = strings.ReplaceAll(

@@ -2,7 +2,7 @@ before:
   hooks:
     - go mod tidy
     - go install github.com/tc-hib/go-winres@latest
-    - go generate winres/init.go
+    - sh -c 'VERSION=v{{.Version}} go generate winres/init.go'
     - go-winres make
 release:
   draft: true

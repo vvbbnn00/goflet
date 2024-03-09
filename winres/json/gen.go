@@ -83,6 +83,11 @@ func main() {
 	}
 	defer f.Close()
 	v := ""
+
+	if base.Version == "" {
+		base.Version = os.Getenv("VERSION")
+	}
+
 	if base.Version == "(devel)" {
 		vartag := bytes.NewBuffer(nil)
 		vartagcmd := exec.Command("git", "tag", "--sort=committerdate")
@@ -107,10 +112,12 @@ func main() {
 	commitcntcmd := exec.Command("git", "rev-list", "--count", "master")
 	commitcntcmd.Stdout = &commitcnt
 	err = commitcntcmd.Run()
+	fv := ""
 	if err != nil {
-		panic(err)
+		fv = "0"
+	} else {
+		fv = commitcnt.String()[:commitcnt.Len()-1]
 	}
-	fv := commitcnt.String()[:commitcnt.Len()-1]
 	_, err = fmt.Fprintf(f, js, fv, fv, v, time.Now().Format(timeformat), fv, time.Now().Year(), v)
 	if err != nil {
 		panic(err)
