@@ -68,12 +68,14 @@ func CanMakeFastResponse(c *gin.Context, fileInfo *model.FileInfo) bool {
 	}
 
 	// Check Last-Modified header
-	lastModified := util.Int64ToHeaderDate(fileInfo.LastModified)
-	if ifModifiedSince := c.GetHeader("If-Modified-Since"); ifModifiedSince != "" && ifModifiedSince >= lastModified {
+	lastModified := fileInfo.LastModified
+	if ifModifiedSince := c.GetHeader("If-Modified-Since"); ifModifiedSince != "" &&
+		util.HeaderDateToInt64(ifModifiedSince) >= lastModified {
 		c.Status(http.StatusNotModified)
 		return true
 	}
-	if ifUnmodifiedSince := c.GetHeader("If-Unmodified-Since"); ifUnmodifiedSince != "" && ifUnmodifiedSince < lastModified {
+	if ifUnmodifiedSince := c.GetHeader("If-Unmodified-Since"); ifUnmodifiedSince != "" &&
+		util.HeaderDateToInt64(ifUnmodifiedSince) < lastModified {
 		c.Status(http.StatusPreconditionFailed)
 		return true
 	}

@@ -164,12 +164,12 @@ func HeaderParseRangeDownload(rangeHeader string, fileSize int64) (start int64, 
 // HeaderDateToInt64 converts a date string in the format
 // "<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT"
 // to an int64 representing the number of seconds since the Unix epoch.
-func HeaderDateToInt64(date string) (int64, error) {
+func HeaderDateToInt64(date string) int64 {
 	t, err := time.Parse(time.RFC1123, date)
 	if err != nil {
-		return 0, err
+		return 0
 	}
-	return t.Unix(), nil
+	return t.Unix()
 }
 
 // Int64ToHeaderDate converts an int64 representing the number of seconds
