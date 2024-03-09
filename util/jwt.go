@@ -3,7 +3,7 @@ package util
 import (
 	"errors"
 	"github.com/golang-jwt/jwt"
-	"goflet/config"
+	"github.com/vvbbnn00/goflet/config"
 )
 
 var (

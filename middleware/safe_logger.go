@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // SafeLogger returns a safe logger middleware

@@ -2,9 +2,9 @@ package meta
 
 import (
 	"github.com/gin-gonic/gin"
-	"goflet/middleware"
-	"goflet/storage"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/middleware"
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/util/log"
 	"net/http"
 	"path/filepath"
 	"strings"

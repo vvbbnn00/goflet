@@ -1,9 +1,9 @@
 package cache
 
 import (
-	"goflet/cache/memory_cache"
-	"goflet/cache/model"
-	"goflet/config"
+	"github.com/vvbbnn00/goflet/cache/memory_cache"
+	"github.com/vvbbnn00/goflet/cache/model"
+	"github.com/vvbbnn00/goflet/config"
 )
 
 var gCache model.Cache

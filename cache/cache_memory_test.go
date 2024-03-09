@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"goflet/config"
+	"github.com/vvbbnn00/goflet/config"
 	"log"
 	"testing"
 	"time"

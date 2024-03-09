@@ -1,8 +1,8 @@
 package scheduled_task
 
 import (
-	"goflet/util"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/util"
+	"github.com/vvbbnn00/goflet/util/log"
 	"io/fs"
 	"os"
 	"path/filepath"

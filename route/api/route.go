@@ -2,10 +2,10 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"goflet/middleware"
-	"goflet/route/api/image"
-	"goflet/route/api/meta"
-	"goflet/route/api/onlyoffice"
+	"github.com/vvbbnn00/goflet/middleware"
+	"github.com/vvbbnn00/goflet/route/api/image"
+	"github.com/vvbbnn00/goflet/route/api/meta"
+	"github.com/vvbbnn00/goflet/route/api/onlyoffice"
 )
 
 // RegisterRoutes load all the enabled routes for the application

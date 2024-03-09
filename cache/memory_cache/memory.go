@@ -2,7 +2,7 @@ package memory_cache
 
 import (
 	"errors"
-	"goflet/cache/model"
+	"github.com/vvbbnn00/goflet/cache/model"
 	"reflect"
 	"sync"
 	"time"

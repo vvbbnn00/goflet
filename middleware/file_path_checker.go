@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"goflet/storage"
-	"goflet/util"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/util"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 // FilePathChecker Ensures the path is valid and does not contain any path traversal

@@ -2,7 +2,7 @@ package log
 
 import (
 	"fmt"
-	"goflet/config"
+	"github.com/vvbbnn00/goflet/config"
 	"log"
 	"os"
 	"path/filepath"

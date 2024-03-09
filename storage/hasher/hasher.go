@@ -1,11 +1,11 @@
 package hasher
 
 import (
-	"goflet/storage"
-	"goflet/storage/model"
-	"goflet/util/hash"
-	"goflet/util/log"
-	"goflet/worker"
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/storage/model"
+	"github.com/vvbbnn00/goflet/util/hash"
+	"github.com/vvbbnn00/goflet/util/log"
+	"github.com/vvbbnn00/goflet/worker"
 	"path/filepath"
 )
 

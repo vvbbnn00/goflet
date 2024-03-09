@@ -2,10 +2,10 @@ package onlyoffice
 
 import (
 	"github.com/gin-gonic/gin"
-	"goflet/middleware"
-	"goflet/storage"
-	"goflet/storage/upload"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/middleware"
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/storage/upload"
+	"github.com/vvbbnn00/goflet/util/log"
 	"io"
 	"net/http"
 )

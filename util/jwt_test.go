@@ -1,7 +1,7 @@
 package util
 
 import (
-	"goflet/config"
+	"github.com/vvbbnn00/goflet/config"
 	"testing"
 )
 

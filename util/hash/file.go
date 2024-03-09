@@ -1,7 +1,7 @@
 package hash
 
 import (
-	"goflet/storage/model"
+	"github.com/vvbbnn00/goflet/storage/model"
 	"os"
 )
 

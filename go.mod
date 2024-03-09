@@ -1,4 +1,4 @@
-module goflet
+module github.com/vvbbnn00/goflet
 
 go 1.22
 

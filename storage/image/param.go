@@ -1,8 +1,8 @@
 package image
 
 import (
-	"goflet/config"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/config"
+	"github.com/vvbbnn00/goflet/util/log"
 	"net/url"
 	"strconv"
 )

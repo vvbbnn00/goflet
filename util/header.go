@@ -2,7 +2,7 @@ package util
 
 import (
 	"errors"
-	"goflet/config"
+	"github.com/vvbbnn00/goflet/config"
 	"strconv"
 	"strings"
 	"time"

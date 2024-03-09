@@ -2,7 +2,8 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"goflet/util"
+	"github.com/vvbbnn00/goflet/util"
+	"github.com/vvbbnn00/goflet/util/log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -28,6 +29,7 @@ func AuthChecker() gin.HandlerFunc {
 
 		claims, err := parseToken(token)
 		if err != nil {
+			log.Debugf("Error parsing token: %s", err.Error())
 			unauthorized(c, "Invalid token")
 			return
 		}

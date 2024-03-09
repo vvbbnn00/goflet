@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/util/log"
 	"sync"
 	"time"
 )

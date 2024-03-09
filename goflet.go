@@ -1,13 +1,16 @@
 package main
 
 import (
-	"goflet/config"
-	"goflet/route"
-	"goflet/scheduled_task"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/base"
+	"github.com/vvbbnn00/goflet/config"
+	"github.com/vvbbnn00/goflet/route"
+	"github.com/vvbbnn00/goflet/scheduled_task"
+	"github.com/vvbbnn00/goflet/util/log"
 )
 
 func main() {
+	base.PrintBanner()
+
 	gofletCfg := config.GofletCfg
 
 	httpConfig := gofletCfg.HTTPConfig

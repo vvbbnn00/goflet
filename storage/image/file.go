@@ -2,9 +2,9 @@ package image
 
 import (
 	"bytes"
-	"goflet/storage"
-	"goflet/storage/model"
-	"goflet/util/log"
+	"github.com/vvbbnn00/goflet/storage"
+	"github.com/vvbbnn00/goflet/storage/model"
+	"github.com/vvbbnn00/goflet/util/log"
 	"io"
 	"os"
 	"path/filepath"
