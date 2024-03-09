@@ -3,6 +3,7 @@ package upload
 import (
 	"errors"
 	"github.com/gabriel-vasile/mimetype"
+	"goflet/cache"
 	"goflet/config"
 	"goflet/storage"
 	"goflet/storage/hasher"
@@ -10,10 +11,16 @@ import (
 	"goflet/storage/model"
 	"goflet/util"
 	"goflet/util/hash"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
+)
+
+const (
+	cachePrefix = "uploading:"
 )
 
 var (
@@ -64,17 +71,22 @@ func GetTempFileWriteStream(relativePath string) (*os.File, error) {
 func CompleteFileUpload(relativePath string) error {
 	fileName := hash.StringSha3New256(relativePath) // Get the hash of the path
 	tmpPath := filepath.Join(uploadPath, fileName)
-
-	// Check if the temporary file exists
-	_, err := os.Stat(tmpPath)
-	if err != nil {
-		return errors.New("file_not_found")
-	}
-
+	c := cache.GetCache()
 	// Ensure the directory exists
 	fsPath, err := storage.RelativeToFsPath(relativePath)
 	if err != nil {
 		return err
+	}
+
+	exists, _ := c.GetBool(cachePrefix + fsPath)
+	if exists {
+		return errors.New("file_uploading")
+	}
+
+	// Check if the temporary file exists
+	_, err = os.Stat(tmpPath)
+	if err != nil {
+		return errors.New("file_not_found")
 	}
 
 	// Make sure the directory exists
@@ -96,7 +108,7 @@ func CompleteFileUpload(relativePath string) error {
 	}
 
 	// Complete the upload
-	completeUpload(fsPath, tmpPath, model.FileMeta{
+	go completeUpload(fsPath, tmpPath, model.FileMeta{
 		RelativePath: relativePath,
 		FileName:     filepath.Base(relativePath),
 		MimeType:     mimeTypeStr,
@@ -108,23 +120,43 @@ func CompleteFileUpload(relativePath string) error {
 
 // completeUpload completes the file upload by renaming the temporary file to the final file
 func completeUpload(fsPath string, tmpPath string, meta model.FileMeta) {
+	c := cache.GetCache()
+	_ = c.SetEx(cachePrefix+fsPath, true, 60)
+
+	defer func() {
+		_ = c.Del(cachePrefix + fsPath)
+	}()
+
 	// The target file path
 	filePath := filepath.Join(fsPath, model.FileAppend)
 
 	// Rename the temporary file to the final file
 	err := storage.MoveFile(tmpPath, filePath)
 	if err != nil {
+		log.Printf("Error moving file: %s", err.Error())
 		return // Give up if the file cannot be moved
 	}
 
 	// Update the file meta
 	err = storage.UpdateFileMeta(fsPath, meta)
 	if err != nil {
+		log.Printf("Error updating file meta: %s", err.Error())
 		return // Give up if the file meta cannot be updated
 	}
 
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
 	// Update the file hash
-	go hasher.HashFileAsync(fsPath)
+	go func() {
+		hasher.HashFileAsync(fsPath)
+		wg.Done()
+	}()
 	// Remove image cache ending with .image_*
-	go image.RemoveImageCache(fsPath)
+	go func() {
+		image.RemoveImageCache(fsPath)
+		wg.Done()
+	}()
+
+	wg.Wait()
 }

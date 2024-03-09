@@ -93,6 +93,10 @@ func routePostFile(c *gin.Context) {
 	err := upload.CompleteFileUpload(relativePath)
 	if err != nil {
 		errStr := err.Error()
+		if errStr == "file_uploading" {
+			c.JSON(http.StatusConflict, gin.H{"error": "The file completion is in progress"})
+			return
+		}
 		if errStr == "file_not_found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 			return

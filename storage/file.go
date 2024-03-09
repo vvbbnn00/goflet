@@ -76,21 +76,27 @@ func PathToFsPath(path string) (string, error) {
 	return RelativeToFsPath(relativePath)
 }
 
-// GetFileInfo returns the file information for the file at the provided path
+// GetFileInfo returns the file information for the file at the provided path, will auto add fileAppend to the path
 func GetFileInfo(fsPath string) (model.FileInfo, error) {
 	filePath := filepath.Join(fsPath, model.FileAppend)
-	file, err := os.Stat(filePath)
+	return GetInfo(filePath)
+}
+
+// GetInfo returns the file information for the file at the provided path
+func GetInfo(fsPath string) (model.FileInfo, error) {
+	fi, err := os.Stat(fsPath)
 	if err != nil {
 		return model.FileInfo{}, err
 	}
 
 	fileInfo := model.FileInfo{
 		FilePath:     fsPath,
-		FileSize:     file.Size(),
-		LastModified: file.ModTime().Unix(),
+		FileSize:     fi.Size(),
+		LastModified: fi.ModTime().Unix(),
 	}
 
-	fileMeta := GetFileMeta(fsPath)
+	metaPath := filepath.Dir(fsPath)
+	fileMeta := GetFileMeta(metaPath)
 
 	return model.FileInfo{
 		FilePath:     fileInfo.FilePath,
@@ -130,6 +136,7 @@ func GetFileMeta(fsPath string) model.FileMeta {
 		return fileMeta
 	}
 
+	println("Cache miss", metaFilePath)
 	metaFile, err := os.OpenFile(metaFilePath, os.O_RDONLY, model.FilePerm)
 
 	fileMeta := model.FileMeta{}
@@ -183,7 +190,8 @@ func UpdateFileMeta(fsPath string, fileMeta model.FileMeta) error {
 
 	// Save the new file metadata
 	metaFilePath := filepath.Join(fsPath, model.MetaAppend)
-	metaFile, err := os.CreateTemp(fsPath, "temp-meta-")
+	tmpFilePath := filepath.Join(fsPath, "tmp-meta-"+util.RandomString(10))
+	metaFile, err := os.OpenFile(tmpFilePath, os.O_CREATE|os.O_RDWR, model.FilePerm)
 	if err != nil {
 		return err
 	}
@@ -191,14 +199,13 @@ func UpdateFileMeta(fsPath string, fileMeta model.FileMeta) error {
 	if err != nil {
 		return err
 	}
-	tmpPath := metaFile.Name()
 	// Close the file
 	_ = metaFile.Close()
 
 	// Move new file meta
-	err = MoveFile(tmpPath, metaFilePath)
+	err = MoveFile(tmpFilePath, metaFilePath)
 	if err != nil {
-		_ = os.Remove(metaFile.Name())
+		_ = os.Remove(tmpFilePath)
 		return err
 	}
 
@@ -230,6 +237,7 @@ func DeleteFile(fsPath string) error {
 	return nil
 }
 
+// MoveFile moves the file from the old path to the new path
 func MoveFile(oldPath, newPath string) error {
 	retryCount := 0
 
@@ -240,11 +248,9 @@ func MoveFile(oldPath, newPath string) error {
 		}
 		err := os.Rename(oldPath, newPath) // This will replace the file if it already exists
 		if err == nil {
-			break
+			return nil
 		}
 		time.Sleep(time.Duration(retryCount) * time.Millisecond) // Sleep for a while before retrying, max 5 seconds in total
 		retryCount++
 	}
-
-	return nil
 }

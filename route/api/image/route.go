@@ -3,6 +3,7 @@ package image
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
+	"goflet/route/file"
 	"goflet/storage"
 	"goflet/storage/image"
 	"goflet/util"
@@ -51,29 +52,20 @@ func routeGetImage(c *gin.Context) {
 	}
 
 	// Check if the file is in the cache
+	cachedFileInfo, _ := image.GetFileImageInfo(fsPath, params)
 	cachedFile, err := image.GetFileImageReader(fsPath, params)
-	fileStat, _ := cachedFile.Stat()
-	if err == nil && fileStat.Size() == 0 {
-		_ = cachedFile.Close()
-	}
-	if err == nil && fileStat.Size() > 0 {
-		// Check if the file has been modified
-		ifModifiedSince, err := util.HeaderDateToInt64(c.GetHeader("If-Modified-Since"))
-		if err == nil {
-			if fileStat.ModTime().Unix() <= ifModifiedSince {
-				c.Status(http.StatusNotModified)
-				return
-			}
-		}
 
+	if err == nil && cachedFileInfo.FileSize > 0 {
+		// Check if the file has been modified
+		if file.CanMakeFastResponse(c, &cachedFileInfo) {
+			return
+		}
 		defer func() {
 			_ = cachedFile.Close()
 		}()
 		// Set the content type
-		c.Header("Content-Type", "image/"+string(params.Format))
-		c.Header("Content-Length", strconv.FormatInt(fileStat.Size(), 10))
-		// Add the cache header
-		c.Header("Last-Modified", fileStat.ModTime().UTC().Format(http.TimeFormat))
+		file.SetCommonHeaders(c, &cachedFileInfo)
+		c.Header("Content-Disposition", "")
 		c.Header("X-Cache", "HIT")
 		// Copy the file to the response
 		_, _ = io.Copy(c.Writer, cachedFile)
@@ -81,16 +73,16 @@ func routeGetImage(c *gin.Context) {
 	}
 
 	// Get the file read stream
-	file, err := storage.GetFileReader(fsPath)
+	reader, err := storage.GetFileReader(fsPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
 	defer func() {
-		_ = file.Close()
+		_ = reader.Close()
 	}()
 
-	imageProcessed, err := image.ProcessImage(file, params)
+	imageProcessed, err := image.ProcessImage(reader, params)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing image"})

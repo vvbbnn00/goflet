@@ -2,12 +2,19 @@ package image
 
 import (
 	"bytes"
+	"goflet/storage"
 	"goflet/storage/model"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 )
+
+// GetFileImageInfo get the file info for the image
+func GetFileImageInfo(fsPath string, params *ProcessParams) (model.FileInfo, error) {
+	fsPath = filepath.Join(fsPath, model.ImageAppend+params.Dump())
+	return storage.GetInfo(fsPath)
+}
 
 // GetFileImageReader get the file reader for the image
 func GetFileImageReader(fsPath string, params *ProcessParams) (*os.File, error) {

@@ -27,10 +27,10 @@ func routeGetFile(c *gin.Context) {
 	}
 
 	// Set common headers
-	setCommonHeaders(c, &fileInfo)
+	SetCommonHeaders(c, &fileInfo)
 
 	// Check if the request can be responded to without reading the file
-	if canMakeFastResponse(c, &fileInfo) {
+	if CanMakeFastResponse(c, &fileInfo) {
 		return
 	}
 
@@ -54,8 +54,8 @@ func routeGetFile(c *gin.Context) {
 	handleRangeRequests(c, file, &fileInfo)
 }
 
-// canMakeFastResponse checks if the request can be responded to without reading the file
-func canMakeFastResponse(c *gin.Context, fileInfo *model.FileInfo) bool {
+// CanMakeFastResponse checks if the request can be responded to without reading the file
+func CanMakeFastResponse(c *gin.Context, fileInfo *model.FileInfo) bool {
 	// Check ETag header
 	etag := generateETag(fileInfo)
 	if ifMatch := c.GetHeader("If-Match"); ifMatch != "" && ifMatch != etag {
@@ -81,8 +81,8 @@ func canMakeFastResponse(c *gin.Context, fileInfo *model.FileInfo) bool {
 	return false
 }
 
-// setCommonHeaders sets common headers for the response
-func setCommonHeaders(c *gin.Context, fileInfo *model.FileInfo) {
+// SetCommonHeaders sets common headers for the response
+func SetCommonHeaders(c *gin.Context, fileInfo *model.FileInfo) {
 	c.Header("Content-Type", getContentType(fileInfo))
 	c.Header("Content-Disposition", "attachment; filename="+fileInfo.FileMeta.FileName)
 	c.Header("Last-Modified", util.Int64ToHeaderDate(fileInfo.LastModified))
