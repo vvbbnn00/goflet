@@ -1,0 +1,14 @@
+version: "3"
+services:
+  goflet:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    volumes:
+      # - ./goflet.json:/app/goflet.json
+      - ./data:/app/data
+      - ./upload:/app/upload
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
