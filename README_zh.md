@@ -14,7 +14,7 @@
 
 <p align="center">
     <a href="https://github.com/vvbbnn00/goflet/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/vvbbnn00/vvbbnn00" alt="license">
+        <img src="https://img.shields.io/github/license/vvbbnn00/goflet" alt="license">
     </a>
     <a href="https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">
         <img src="https://app.codacy.com/project/badge/Grade/f8c9b87f2f7a4af2baf12ddd8d09c475" alt="codacy-quality"/>
