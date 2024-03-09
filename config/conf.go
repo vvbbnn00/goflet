@@ -24,7 +24,18 @@ type GofletConfig struct {
 	HTTPConfig struct {
 		Host string `json:"host" default:"0.0.0.0"` // The host to bind the server
 		Port int    `json:"port" default:"8080"`    // The port to bind the server
-
+		Cors struct {
+			// CORS configuration
+			Enabled bool     `json:"enabled" default:"true"` // Enable CORS
+			Origins []string `json:"origins"`                // The list of allowed origins
+			Methods []string `json:"methods"`                // The list of allowed methods
+			Headers []string `json:"headers"`                // The list of allowed headers
+		} `json:"cors"`
+		ClientCache struct {
+			// Client cache configuration
+			Enabled bool `json:"enabled" default:"true"` // Enable client cache
+			MaxAge  int  `json:"maxAge" default:"3600"`  // The maximum age of the client cache
+		} `json:"clientCache"`
 		HTTPSConfig struct {
 			// HTTPS configuration
 			Enabled bool   `json:"enabled" default:"false"` // Enable HTTPS
