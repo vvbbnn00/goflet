@@ -13,10 +13,8 @@ jobs:
       - name: Checkout
         run: |
           git version
-          git clone "${{ github.event.repository.html_url }}" /home/runner/work/goflet/goflet
+          git clone git@github.com:vvbbnn00/goflet /home/runner/work/goflet/goflet
           git checkout "${{ github.ref }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
         uses: actions/setup-go@v3
