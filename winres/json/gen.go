@@ -83,6 +83,11 @@ func main() {
 	}
 	defer f.Close()
 	v := ""
+
+	if base.Version == "" {
+		base.Version = os.Getenv("VERSION")
+	}
+
 	if base.Version == "(devel)" {
 		vartag := bytes.NewBuffer(nil)
 		vartagcmd := exec.Command("git", "tag", "--sort=committerdate")
