@@ -99,7 +99,7 @@ func GetFileInfo(fsPath string) (model.FileInfo, error) {
 func GetFileReader(fsPath string) (*os.File, error) {
 	filePath := filepath.Join(fsPath, model.FileAppend)
 
-	file, err := os.OpenFile(filePath, os.O_RDONLY, 0644)
+	file, err := os.OpenFile(filePath, os.O_RDONLY, model.FilePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func GetFileMeta(fsPath string) model.FileMeta {
 		return fileMeta
 	}
 
-	metaFile, err := os.OpenFile(metaFilePath, os.O_RDONLY, 0644)
+	metaFile, err := os.OpenFile(metaFilePath, os.O_RDONLY, model.FilePerm)
 
 	fileMeta := model.FileMeta{}
 
@@ -178,7 +178,7 @@ func UpdateFileMeta(faPath string, fileMeta model.FileMeta) error {
 
 	// Save the new file metadata
 	metaFilePath := filepath.Join(faPath, model.MetaAppend)
-	metaFile, err := os.OpenFile(metaFilePath, os.O_CREATE|os.O_RDWR, 0644)
+	metaFile, err := os.OpenFile(metaFilePath, os.O_CREATE|os.O_RDWR, model.FilePerm)
 	if err != nil {
 		return err
 	}

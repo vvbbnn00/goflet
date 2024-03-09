@@ -52,7 +52,7 @@ func GetTempFileWriteStream(relativePath string) (*os.File, error) {
 		return nil, err
 	}
 
-	file, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_RDWR, 0644)
+	file, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_RDWR, model.FilePerm)
 	if err != nil {
 		return nil, err
 	}

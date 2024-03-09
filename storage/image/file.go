@@ -13,7 +13,7 @@ import (
 func GetFileImageReader(fsPath string, params *ProcessParams) (*os.File, error) {
 	fsPath = filepath.Join(fsPath, model.ImageAppend+params.Dump())
 
-	file, err := os.OpenFile(fsPath, os.O_RDONLY, 0644)
+	file, err := os.OpenFile(fsPath, os.O_RDONLY, model.FilePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func SaveFileImageCache(fsPath string, params *ProcessParams, buffer bytes.Buffe
 	fsPath = filepath.Join(fsPath, model.ImageAppend+params.Dump())
 
 	// Copy the file to the cache
-	cacheFile, err := os.OpenFile(fsPath, os.O_CREATE|os.O_RDWR, 0644)
+	cacheFile, err := os.OpenFile(fsPath, os.O_CREATE|os.O_RDWR, model.FilePerm)
 	if err != nil {
 		_ = cacheFile.Close()
 		return err

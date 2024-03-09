@@ -3,13 +3,14 @@ package hash
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"goflet/storage/model"
 	"io"
 	"os"
 )
 
 // FileSha256 returns the sha256 hash of the file
 func FileSha256(path string) (string, error) {
-	reader, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	reader, err := os.OpenFile(path, os.O_RDONLY, model.FilePerm)
 	if err != nil {
 		return "", err
 	}

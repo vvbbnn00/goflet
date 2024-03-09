@@ -8,6 +8,7 @@ const (
 	ImageAppend                  = ".image_"
 	FileMetaCachePrefix          = "file_meta_"
 	ImageCachePrefixWithWildcard = ".image_*"
+	FilePerm                     = 0600 // File permission, only the owner can read and write
 )
 
 type FileHash struct {
