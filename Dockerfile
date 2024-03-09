@@ -7,7 +7,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o goflet .
 
-FROM alpine:latest
+FROM alpine:3.19
 
 WORKDIR /app/
 COPY --from=builder /app/goflet .
