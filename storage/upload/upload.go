@@ -84,9 +84,6 @@ func CompleteFileUpload(relativePath string) error {
 		return err
 	}
 
-	// The target file path
-	filePath := filepath.Join(fsPath, model.FileAppend)
-
 	// Open the temporary file to get file header info
 	mimeType, err := mimetype.DetectFile(tmpPath)
 	if err != nil {
@@ -98,27 +95,36 @@ func CompleteFileUpload(relativePath string) error {
 		mimeTypeStr = "text/plain"
 	}
 
+	// Complete the upload
+	completeUpload(fsPath, tmpPath, model.FileMeta{
+		RelativePath: relativePath,
+		FileName:     filepath.Base(relativePath),
+		MimeType:     mimeTypeStr,
+		UploadedAt:   time.Now().Unix(),
+	})
+
+	return nil
+}
+
+// completeUpload completes the file upload by renaming the temporary file to the final file
+func completeUpload(fsPath string, tmpPath string, meta model.FileMeta) {
+	// The target file path
+	filePath := filepath.Join(fsPath, model.FileAppend)
+
 	// Rename the temporary file to the final file
-	err = os.Rename(tmpPath, filePath) // This will replace the file if it already exists
+	err := storage.MoveFile(tmpPath, filePath)
 	if err != nil {
-		return err
+		return // Give up if the file cannot be moved
 	}
 
 	// Update the file meta
-	err = storage.UpdateFileMeta(fsPath, model.FileMeta{
-		RelativePath: relativePath,
-		FileName:     filepath.Base(relativePath),
-		UploadedAt:   time.Now().Unix(),
-		MimeType:     mimeTypeStr,
-	})
+	err = storage.UpdateFileMeta(fsPath, meta)
 	if err != nil {
-		return err
+		return // Give up if the file meta cannot be updated
 	}
 
 	// Update the file hash
 	go hasher.HashFileAsync(fsPath)
 	// Remove image cache ending with .image_*
 	go image.RemoveImageCache(fsPath)
-
-	return nil
 }

@@ -56,36 +56,26 @@ func routeGetFile(c *gin.Context) {
 
 // canMakeFastResponse checks if the request can be responded to without reading the file
 func canMakeFastResponse(c *gin.Context, fileInfo *model.FileInfo) bool {
-	// If-Match and If-None-Match headers
+	// Check ETag header
 	etag := generateETag(fileInfo)
-	if ifMatch := c.GetHeader("If-Match"); ifMatch != "" {
-		if ifMatch != etag {
-			c.Status(http.StatusPreconditionFailed)
-			return true
-		}
+	if ifMatch := c.GetHeader("If-Match"); ifMatch != "" && ifMatch != etag {
+		c.Status(http.StatusPreconditionFailed)
+		return true
 	}
-	if ifNoneMatch := c.GetHeader("If-None-Match"); ifNoneMatch != "" {
-		if ifNoneMatch == etag {
-			c.Status(http.StatusNotModified)
-			return true
-		}
+	if ifNoneMatch := c.GetHeader("If-None-Match"); ifNoneMatch != "" && ifNoneMatch == etag {
+		c.Status(http.StatusNotModified)
+		return true
 	}
 
-	// If-Modified-Since and If-Unmodified-Since headers
-	if ifModifiedSince := c.GetHeader("If-Modified-Since"); ifModifiedSince != "" {
-		ifModifiedSinceTime, err := util.HeaderDateToInt64(ifModifiedSince)
-		if err == nil && fileInfo.LastModified <= ifModifiedSinceTime {
-			c.Status(http.StatusNotModified)
-			return true
-		}
+	// Check Last-Modified header
+	lastModified := util.Int64ToHeaderDate(fileInfo.LastModified)
+	if ifModifiedSince := c.GetHeader("If-Modified-Since"); ifModifiedSince != "" && ifModifiedSince >= lastModified {
+		c.Status(http.StatusNotModified)
+		return true
 	}
-
-	if ifUnmodifiedSince := c.GetHeader("If-Unmodified-Since"); ifUnmodifiedSince != "" {
-		ifUnmodifiedSinceTime, err := util.HeaderDateToInt64(ifUnmodifiedSince)
-		if err == nil && fileInfo.LastModified > ifUnmodifiedSinceTime {
-			c.Status(http.StatusPreconditionFailed)
-			return true
-		}
+	if ifUnmodifiedSince := c.GetHeader("If-Unmodified-Since"); ifUnmodifiedSince != "" && ifUnmodifiedSince < lastModified {
+		c.Status(http.StatusPreconditionFailed)
+		return true
 	}
 
 	return false
@@ -106,46 +96,37 @@ func setCommonHeaders(c *gin.Context, fileInfo *model.FileInfo) {
 
 // handleRangeRequests handles byte range requests
 func handleRangeRequests(c *gin.Context, file *os.File, fileInfo *model.FileInfo) {
-	if rangeHeader := c.GetHeader("Range"); rangeHeader != "" {
-		byteStart, byteEnd, err := util.HeaderParseRangeDownload(rangeHeader, fileInfo.FileSize)
-		if err != nil {
-			c.JSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": err.Error()})
-			return
-		}
-		contentLength := byteEnd - byteStart + 1
-
-		etag := generateETag(fileInfo)
-		lastModified := util.Int64ToHeaderDate(fileInfo.LastModified)
-		if ifRange := c.GetHeader("If-Range"); ifRange != "" {
-			if ifRange != etag && ifRange != lastModified {
-				// The resource has been modified, so send the entire file
-				byteStart = 0
-				byteEnd = fileInfo.FileSize - 1
-				contentLength = fileInfo.FileSize
-			}
-		}
-
-		c.Header("Content-Length", strconv.FormatInt(contentLength, 10))
-		c.Header("Content-Range", "bytes "+strconv.FormatInt(byteStart, 10)+"-"+strconv.FormatInt(byteEnd, 10)+"/"+strconv.FormatInt(fileInfo.FileSize, 10))
-
-		if _, err := file.Seek(byteStart, io.SeekStart); err != nil {
-			log.Printf("Error seeking file: %s", err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
-			return
-		}
-
-		c.Status(http.StatusPartialContent)
-		_, err = io.CopyN(c.Writer, file, contentLength)
-		if err != nil {
-			return
-		}
-	} else {
+	rangeHeader := c.GetHeader("Range")
+	if rangeHeader == "" {
 		c.Header("Content-Length", strconv.FormatInt(fileInfo.FileSize, 10))
 		c.Status(http.StatusOK)
 		_, err := io.Copy(c.Writer, file)
 		if err != nil {
-			return
+			log.Printf("Error copying file: %s", err.Error())
 		}
+		return
+	}
+
+	byteStart, byteEnd, err := util.HeaderParseRangeDownload(rangeHeader, fileInfo.FileSize)
+	if err != nil {
+		c.JSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": err.Error()})
+		return
+	}
+	contentLength := byteEnd - byteStart + 1
+
+	c.Header("Content-Length", strconv.FormatInt(contentLength, 10))
+	c.Header("Content-Range", fmt.Sprintf("bytes %d-%d/%d", byteStart, byteEnd, fileInfo.FileSize))
+
+	if _, err := file.Seek(byteStart, io.SeekStart); err != nil {
+		log.Printf("Error seeking file: %s", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
+		return
+	}
+
+	c.Status(http.StatusPartialContent)
+	_, err = io.CopyN(c.Writer, file, contentLength)
+	if err != nil {
+		log.Printf("Error copying file: %s", err.Error())
 	}
 }
 
@@ -159,5 +140,5 @@ func getContentType(fileInfo *model.FileInfo) string {
 
 // generateETag generates an ETag for the file based on its metadata
 func generateETag(fileInfo *model.FileInfo) string {
-	return fmt.Sprintf(`"%x-%x"`, fileInfo.LastModified, fileInfo.FileSize)
+	return fmt.Sprintf(`"%x-%x-%s"`, fileInfo.LastModified, fileInfo.FileSize, fileInfo.FileMeta.Hash.HashSha1)
 }

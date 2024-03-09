@@ -11,6 +11,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
+)
+
+const (
+	maxRetryCount = 100 // The maximum number of times to retry the file upload
 )
 
 var (
@@ -150,8 +155,8 @@ func GetFileMeta(fsPath string) model.FileMeta {
 }
 
 // UpdateFileMeta updates the file metadata for the file at the provided path
-func UpdateFileMeta(faPath string, fileMeta model.FileMeta) error {
-	oldFileMeta := GetFileMeta(faPath)
+func UpdateFileMeta(fsPath string, fileMeta model.FileMeta) error {
+	oldFileMeta := GetFileMeta(fsPath)
 
 	// Merge the old and new file metadata
 	if fileMeta.RelativePath == "" {
@@ -177,19 +182,25 @@ func UpdateFileMeta(faPath string, fileMeta model.FileMeta) error {
 	}
 
 	// Save the new file metadata
-	metaFilePath := filepath.Join(faPath, model.MetaAppend)
-	metaFile, err := os.OpenFile(metaFilePath, os.O_CREATE|os.O_RDWR, model.FilePerm)
+	metaFilePath := filepath.Join(fsPath, model.MetaAppend)
+	metaFile, err := os.CreateTemp(fsPath, "temp-meta-")
 	if err != nil {
 		return err
 	}
-
 	err = gob.NewEncoder(metaFile).Encode(fileMeta)
 	if err != nil {
 		return err
 	}
-
+	tmpPath := metaFile.Name()
 	// Close the file
 	_ = metaFile.Close()
+
+	// Move new file meta
+	err = MoveFile(tmpPath, metaFilePath)
+	if err != nil {
+		_ = os.Remove(metaFile.Name())
+		return err
+	}
 
 	// Cache the file metadata
 	go func() {
@@ -216,5 +227,24 @@ func DeleteFile(fsPath string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func MoveFile(oldPath, newPath string) error {
+	retryCount := 0
+
+	// Rename the temporary file to the final file
+	for {
+		if retryCount >= maxRetryCount {
+			return errors.New("max_retry_count_exceeded") // Max retry count exceeded
+		}
+		err := os.Rename(oldPath, newPath) // This will replace the file if it already exists
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Duration(retryCount) * time.Millisecond) // Sleep for a while before retrying, max 5 seconds in total
+		retryCount++
+	}
+
 	return nil
 }
