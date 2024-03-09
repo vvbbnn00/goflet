@@ -11,6 +11,7 @@ var scheduleToCheck = map[string]func(){
 	"CleanOutdatedFile": CleanOutdatedFile,
 }
 
+// runOneTask runs the task
 func runOneTask(name string, task func()) {
 	log.Printf("Start running task [%s].", name)
 	task()
