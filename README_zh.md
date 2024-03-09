@@ -19,6 +19,9 @@
     <a href="https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">
         <img src="https://app.codacy.com/project/badge/Grade/f8c9b87f2f7a4af2baf12ddd8d09c475" alt="codacy-quality"/>
     </a>
+    <a href="https://goreportcard.com/report/github.com/vvbbnn00/goflet">
+        <img src="https://goreportcard.com/badge/github.com/vvbbnn00/goflet" alt="go-report"/>
+    </a>
 </p>
 
 <div align="center">
