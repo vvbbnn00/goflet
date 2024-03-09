@@ -2,8 +2,10 @@ package image
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/disintegration/imaging"
 	"github.com/nfnt/resize"
+	"goflet/config"
 	"image"
 	"image/color"
 	"log"
@@ -12,10 +14,15 @@ import (
 
 // ProcessImage process the image with the given parameters
 func ProcessImage(fs *os.File, p *ProcessParams) (*bytes.Buffer, error) {
-
+	conf := config.GofletCfg.ImageConfig
 	decoded, _, err := image.Decode(fs)
 	if err != nil {
 		return nil, err
+	}
+
+	width, height := decoded.Bounds().Dx(), decoded.Bounds().Dy()
+	if width > conf.MaxWidth || height > conf.MaxHeight {
+		return nil, fmt.Errorf("image size is too large")
 	}
 
 	// Resize the image

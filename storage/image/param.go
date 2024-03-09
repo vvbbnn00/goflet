@@ -1,6 +1,7 @@
 package image
 
 import (
+	"goflet/config"
 	"log"
 	"net/url"
 	"strconv"
@@ -47,15 +48,39 @@ func (i *ProcessParams) Dump() string {
 		strconv.Itoa(i.Angle) + "f" + string(i.Format)
 }
 
+// whether the int in the array
+func in(num int, arr []int) bool {
+	for _, v := range arr {
+		if v == num {
+			return true
+		}
+	}
+	return false
+}
+
 // GetProcessParamsFromQuery get the image process parameters from the query
 func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
+	conf := config.GofletCfg.ImageConfig
+
 	params := &ProcessParams{}
 	if width := query.Get("w"); width != "" {
 		params.Width, _ = strconv.Atoi(width)
 	}
+	if conf.StrictMode && !in(params.Width, conf.AllowedSizes) {
+		params.Width = 0
+	} else {
+		params.Width = max(params.Width, 0)
+	}
+
 	if height := query.Get("h"); height != "" {
 		params.Height, _ = strconv.Atoi(height)
 	}
+	if conf.StrictMode && !in(params.Height, conf.AllowedSizes) {
+		params.Height = 0
+	} else {
+		params.Height = max(params.Height, 0)
+	}
+
 	if scale := query.Get("s"); scale != "" {
 		switch scale {
 		case "fit":
@@ -94,10 +119,10 @@ func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
 		//case "webp":
 		//	params.Format = PictureFormatWebp
 		default:
-			params.Format = PictureFormatJpeg
+			params.Format = PictureFormat(conf.DefaultFormat)
 		}
 	} else {
-		params.Format = PictureFormatJpeg
+		params.Format = PictureFormat(conf.DefaultFormat)
 	}
 
 	// If the format is PNG, the quality has only 2 values: 100 or 85

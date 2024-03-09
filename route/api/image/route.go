@@ -2,6 +2,7 @@ package image
 
 import (
 	"github.com/gin-gonic/gin"
+	"goflet/config"
 	"goflet/middleware"
 	"goflet/route/file"
 	"goflet/storage"
@@ -11,10 +12,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-)
-
-const (
-	maxImageProcessingSize = 20 * 1024 * 1024 // 20MB
 )
 
 // RegisterRoutes load all the enabled routes for the application
@@ -46,7 +43,7 @@ func routeGetImage(c *gin.Context) {
 	params := image.GetProcessParamsFromQuery(c.Request.URL.Query())
 
 	// Check if the file is too large
-	if fileInfo.FileSize > maxImageProcessingSize {
+	if fileInfo.FileSize > config.GofletCfg.ImageConfig.MaxFileSize {
 		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "File too large"})
 		return
 	}
@@ -85,6 +82,11 @@ func routeGetImage(c *gin.Context) {
 	imageProcessed, err := image.ProcessImage(reader, params)
 
 	if err != nil {
+		if err.Error() == "image size is too large" {
+			c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Image size is too large"})
+			return
+		}
+		log.Printf("Error processing image: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing image"})
 		return
 	}

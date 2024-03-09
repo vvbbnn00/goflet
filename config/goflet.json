@@ -44,6 +44,27 @@
       "defaultTTL": 60
     }
   },
+  "imageConfig": {
+    "defaultFormat": "jpeg",
+    "allowedFormats": [
+      "png",
+      "jpeg",
+      "gif"
+    ],
+    "strictMode": true,
+    "allowedSizes": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "maxFileSize": 20971520,
+    "maxWidth": 4096,
+    "maxHeight": 4096
+  },
   "jwtConfig": {
     "enabled": true,
     "algorithm": "HS256",

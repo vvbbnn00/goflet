@@ -60,6 +60,18 @@ type GofletConfig struct {
 			DefaultTTL int `json:"defaultTTL" default:"60"`  // The default time to live for the cache
 		}
 	} `json:"cacheConfig"`
+	ImageConfig struct {
+		// Image configuration
+		DefaultFormat  string   `json:"defaultFormat" default:"png"` // The default format for the image
+		AllowedFormats []string `json:"allowedFormats"`              // The list of allowed formats for the image
+
+		StrictMode   bool  `json:"strictMode" default:"true"` // If true, the image size will only accept the allowed sizes
+		AllowedSizes []int `json:"allowedSizes"`              // The list of allowed sizes for the image, like 32, 64, 128, 256
+
+		MaxWidth    int   `json:"maxWidth" default:"4096"`        // The maximum width of the image
+		MaxHeight   int   `json:"maxHeight" default:"4096"`       // The maximum height of the image
+		MaxFileSize int64 `json:"maxFileSize" default:"20971520"` // The maximum size of the image file
+	} `json:"imageConfig"`
 	JWTConfig struct {
 		// JWT configuration
 		Enabled   bool   `json:"enabled" default:"true"`    // Enable JWT
