@@ -6,3 +6,5 @@ cert
 /goflet.json
 .air.toml
 *.exe
+winres.json
+*.syso
