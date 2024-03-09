@@ -8,16 +8,23 @@ import (
 	"goflet/route/api"
 	"goflet/route/file"
 	"io"
+	"os"
 	"time"
 )
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
-	// Disable the default logger
-	gin.DefaultWriter = io.Discard
-
 	router := gin.Default()
+
+	if config.GofletCfg.Debug {
+		gin.SetMode(gin.DebugMode)
+		gin.DefaultWriter = os.Stdout
+	} else {
+		// Disable the default logger
+		gin.SetMode(gin.ReleaseMode)
+		gin.DefaultWriter = io.Discard
+	}
+
 	// Log the requests
 	router.Use(middleware.SafeLogger())
 

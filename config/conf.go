@@ -21,6 +21,7 @@ const (
 )
 
 type GofletConfig struct {
+	Debug     bool `json:"debug" default:"false"` // Enable debug mode
 	LogConfig struct {
 		// Log configuration
 		Enabled bool   `json:"enabled" default:"true"` // Enable log

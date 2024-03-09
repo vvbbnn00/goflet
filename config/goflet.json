@@ -1,4 +1,5 @@
 {
+  "debug": false,
   "logConfig": {
     "enabled": true,
     "level": "info"
