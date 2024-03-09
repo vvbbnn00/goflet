@@ -2,8 +2,8 @@ package scheduled_task
 
 import (
 	"goflet/util"
+	"goflet/util/log"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -32,7 +32,7 @@ func DeleteEmptyFolder() {
 		pathFs := os.DirFS(path)
 		entries, _ := fs.ReadDir(pathFs, ".")
 		if len(entries) == 0 && path != dataPath {
-			log.Printf("Remove empty folder: %s", path)
+			log.Infof("Remove empty folder: %s", path)
 			_ = os.Remove(path)
 		}
 	}

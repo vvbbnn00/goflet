@@ -3,7 +3,7 @@ package config
 import (
 	_ "embed"
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -21,6 +21,11 @@ const (
 )
 
 type GofletConfig struct {
+	LogConfig struct {
+		// Log configuration
+		Enabled bool   `json:"enabled" default:"true"` // Enable log
+		Level   string `json:"level" default:"info"`   // The log level
+	} `json:"logConfig"`
 	HTTPConfig struct {
 		Host string `json:"host" default:"0.0.0.0"` // The host to bind the server
 		Port int    `json:"port" default:"8080"`    // The port to bind the server
@@ -136,7 +141,7 @@ func InitConfig() {
 
 	// Set the default value for the cache type
 	if !GofletCfg.JWTConfig.Enabled {
-		log.Printf("[WARN] JWT is disabled, the security of the application is not guaranteed.")
+		fmt.Printf("[WARN] JWT is disabled, the security of the application is not guaranteed.")
 	}
 }
 

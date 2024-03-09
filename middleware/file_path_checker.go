@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goflet/storage"
 	"goflet/util"
-	"log"
+	"goflet/util/log"
 )
 
 // FilePathChecker Ensures the path is valid and does not contain any path traversal
@@ -20,7 +20,7 @@ func FilePathChecker() gin.HandlerFunc {
 
 		cleanedPath, err := util.ClarifyPath(path)
 		if err != nil {
-			log.Printf("Invalid path: %s, error: %s", path, err.Error())
+			log.Debugf("Invalid path: %s, error: %s", path, err.Error())
 			c.JSON(400, gin.H{"error": "Invalid path"})
 			c.Abort()
 			return
@@ -28,7 +28,7 @@ func FilePathChecker() gin.HandlerFunc {
 
 		relativePath, err := storage.PathToRelativePath(cleanedPath)
 		if err != nil {
-			log.Printf("Error converting to fs path: %s", err.Error())
+			log.Debugf("Error converting to fs path: %s", err.Error())
 			c.JSON(400, gin.H{"error": "Invalid path"})
 			c.Abort()
 			return
@@ -36,7 +36,7 @@ func FilePathChecker() gin.HandlerFunc {
 
 		fsPath, err := storage.RelativeToFsPath(relativePath)
 		if err != nil {
-			log.Printf("Error converting to fs path: %s", err.Error())
+			log.Debugf("Error converting to fs path: %s", err.Error())
 			c.JSON(400, gin.H{"error": "Invalid path"})
 			c.Abort()
 			return

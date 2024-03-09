@@ -7,8 +7,8 @@ import (
 	"goflet/storage"
 	"goflet/storage/model"
 	"goflet/util"
+	"goflet/util/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -21,7 +21,7 @@ func routeGetFile(c *gin.Context) {
 	// Get the file info
 	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
-		log.Printf("Error getting file info: %s", err.Error())
+		log.Debugf("Error getting file info: %s", err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
@@ -42,7 +42,7 @@ func routeGetFile(c *gin.Context) {
 	// Get the file reader
 	file, err := storage.GetFileReader(fsPath)
 	if err != nil {
-		log.Printf("Error getting file reader: %s", err.Error())
+		log.Warnf("Error getting file reader: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
@@ -102,7 +102,7 @@ func handleRangeRequests(c *gin.Context, file *os.File, fileInfo *model.FileInfo
 		c.Status(http.StatusOK)
 		_, err := io.Copy(c.Writer, file)
 		if err != nil {
-			log.Printf("Error copying file: %s", err.Error())
+			log.Warnf("Error copying file: %s", err.Error())
 		}
 		return
 	}
@@ -118,7 +118,7 @@ func handleRangeRequests(c *gin.Context, file *os.File, fileInfo *model.FileInfo
 	c.Header("Content-Range", fmt.Sprintf("bytes %d-%d/%d", byteStart, byteEnd, fileInfo.FileSize))
 
 	if _, err := file.Seek(byteStart, io.SeekStart); err != nil {
-		log.Printf("Error seeking file: %s", err.Error())
+		log.Warnf("Error seeking file: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
@@ -126,7 +126,7 @@ func handleRangeRequests(c *gin.Context, file *os.File, fileInfo *model.FileInfo
 	c.Status(http.StatusPartialContent)
 	_, err = io.CopyN(c.Writer, file, contentLength)
 	if err != nil {
-		log.Printf("Error copying file: %s", err.Error())
+		log.Warnf("Error copying file: %s", err.Error())
 	}
 }
 

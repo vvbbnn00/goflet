@@ -8,8 +8,8 @@ import (
 	"goflet/storage"
 	"goflet/storage/image"
 	"goflet/util"
+	"goflet/util/log"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -86,7 +86,7 @@ func routeGetImage(c *gin.Context) {
 			c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Image size is too large"})
 			return
 		}
-		log.Printf("Error processing image: %s", err.Error())
+		log.Warnf("Error processing image: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing image"})
 		return
 	}
@@ -101,7 +101,7 @@ func routeGetImage(c *gin.Context) {
 	go func() {
 		err := image.SaveFileImageCache(fsPath, params, *imageProcessed)
 		if err != nil {
-			log.Printf("Error saving image cache: %s", err.Error())
+			log.Warnf("Error saving image cache: %s", err.Error())
 		}
 	}()
 

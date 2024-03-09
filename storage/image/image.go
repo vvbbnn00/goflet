@@ -6,9 +6,9 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/nfnt/resize"
 	"goflet/config"
+	"goflet/util/log"
 	"image"
 	"image/color"
-	"log"
 	"os"
 )
 
@@ -95,6 +95,6 @@ func rotateImage(img image.Image, angle int) image.Image {
 		return img
 	}
 	angle = angle % 360 // Normalize the angle
-	log.Printf("Rotating the image by %d degrees", angle)
+	log.Warnf("Rotating the image by %d degrees", angle)
 	return imaging.Rotate(img, float64(angle), color.Transparent)
 }

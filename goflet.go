@@ -4,7 +4,7 @@ import (
 	"goflet/config"
 	"goflet/route"
 	"goflet/scheduled_task"
-	"log"
+	"goflet/util/log"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			log.Printf("HTTPS server started on %s", endpoint)
+			log.Infof("HTTPS server started on %s", endpoint)
 		}()
 	} else {
 		go func() {
@@ -29,7 +29,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			log.Printf("HTTP server started on %s", endpoint)
+			log.Infof("HTTP server started on %s", endpoint)
 		}()
 	}
 

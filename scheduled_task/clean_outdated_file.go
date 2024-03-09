@@ -3,8 +3,8 @@ package scheduled_task
 import (
 	"goflet/config"
 	"goflet/util"
+	"goflet/util/log"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -21,7 +21,7 @@ func CleanOutdatedFile() {
 		}
 		if !info.IsDir() {
 			if time.Since(info.ModTime()) > UploadTimeout {
-				log.Printf("Remove outdated file: %s", path)
+				log.Infof("Remove outdated file: %s", path)
 				_ = os.Remove(path)
 			}
 		}

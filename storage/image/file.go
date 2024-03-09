@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"goflet/storage"
 	"goflet/storage/model"
+	"goflet/util/log"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -59,7 +59,7 @@ func RemoveImageCache(fsPath string) {
 	files, err := filepath.Glob(pathPattern)
 
 	if err != nil {
-		log.Printf("Error removing image cache: %s", err.Error())
+		log.Warnf("Error removing image cache: %s", err.Error())
 	}
 
 	// Remove the files

@@ -11,7 +11,7 @@ import (
 	"goflet/storage/model"
 	"goflet/util"
 	"goflet/util/hash"
-	"log"
+	"goflet/util/log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -133,14 +133,14 @@ func completeUpload(fsPath string, tmpPath string, meta model.FileMeta) {
 	// Rename the temporary file to the final file
 	err := storage.MoveFile(tmpPath, filePath)
 	if err != nil {
-		log.Printf("Error moving file: %s", err.Error())
+		log.Warnf("Error moving file: %s", err.Error())
 		return // Give up if the file cannot be moved
 	}
 
 	// Update the file meta
 	err = storage.UpdateFileMeta(fsPath, meta)
 	if err != nil {
-		log.Printf("Error updating file meta: %s", err.Error())
+		log.Warnf("Error updating file meta: %s", err.Error())
 		return // Give up if the file meta cannot be updated
 	}
 

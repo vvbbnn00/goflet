@@ -2,7 +2,7 @@ package image
 
 import (
 	"goflet/config"
-	"log"
+	"goflet/util/log"
 	"net/url"
 	"strconv"
 )
@@ -37,7 +37,7 @@ type ProcessParams struct {
 
 // Print the parameters
 func (i *ProcessParams) Print() {
-	log.Printf("Width: %d, Height: %d, Scale: %d, Quality: %d, Angle: %d, Format: %s",
+	log.Debugf("Width: %d, Height: %d, Scale: %d, Quality: %d, Angle: %d, Format: %s",
 		i.Width, i.Height, i.Scale, i.Quality, i.Angle, i.Format)
 }
 

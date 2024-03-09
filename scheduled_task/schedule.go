@@ -2,7 +2,7 @@ package scheduled_task
 
 import (
 	"goflet/config"
-	"log"
+	"goflet/util/log"
 	"reflect"
 )
 
@@ -13,9 +13,9 @@ var scheduleToCheck = map[string]func(){
 
 // runOneTask runs the task
 func runOneTask(name string, task func()) {
-	log.Printf("Start running task [%s].", name)
+	log.Infof("Start running task [%s].", name)
 	task()
-	log.Printf("Task [%s] completed.", name)
+	log.Infof("Task [%s] completed.", name)
 }
 
 // RunScheduledTask runs the scheduled tasks
@@ -30,16 +30,16 @@ func RunScheduledTask() {
 		}
 		value := reflectSchedule.FieldByName(name)
 		if !value.IsValid() {
-			log.Printf("Task [%s] is not scheduled.", name)
+			log.Debugf("Task [%s] is not scheduled.", name)
 			continue
 		}
 		if value.Int() <= 0 {
-			log.Printf("Task [%s] is not scheduled.", name)
+			log.Debugf("Task [%s] is not scheduled.", name)
 			continue
 		}
 
 		// Run the task in a goroutine
-		log.Printf("Task [%s] is scheduled every %d seconds.", name, value.Int())
+		log.Infof("Task [%s] is scheduled every %d seconds.", name, value.Int())
 		go runOneTask(name, task)
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"goflet/storage/model"
 	"goflet/util"
 	"goflet/util/hash"
-	"log"
+	"goflet/util/log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -131,12 +131,12 @@ func GetFileMeta(fsPath string) model.FileMeta {
 		fileMeta := model.FileMeta{}
 		err = gob.NewDecoder(strings.NewReader(cachedMeta)).Decode(&fileMeta)
 		if err != nil {
-			log.Printf("Error decoding meta file: %s", err.Error())
+			log.Warnf("Error decoding meta file: %s", err.Error())
 		}
 		return fileMeta
 	}
 
-	println("Cache miss", metaFilePath)
+	log.Debugf("Cache miss: %s", metaFilePath)
 	metaFile, err := os.OpenFile(metaFilePath, os.O_RDONLY, model.FilePerm)
 
 	fileMeta := model.FileMeta{}
@@ -144,7 +144,7 @@ func GetFileMeta(fsPath string) model.FileMeta {
 	if err == nil {
 		gerr := gob.NewDecoder(metaFile).Decode(&fileMeta)
 		if gerr != nil {
-			log.Printf("Error decoding meta file: %s", gerr.Error())
+			log.Warnf("Error decoding meta file: %s", gerr.Error())
 		}
 	}
 

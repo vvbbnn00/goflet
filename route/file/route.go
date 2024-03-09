@@ -6,8 +6,8 @@ import (
 	"goflet/storage"
 	"goflet/storage/upload"
 	"goflet/util"
+	"goflet/util/log"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -45,13 +45,13 @@ func routePutFile(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Directory creation not allowed"})
 			return
 		}
-		log.Printf("Error getting write stream: %s", errStr)
+		log.Warnf("Error getting write stream: %s", errStr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 	defer func() {
 		if closeErr := writeStream.Close(); closeErr != nil {
-			log.Printf("Error closing write stream: %s", closeErr.Error())
+			log.Warnf("Error closing write stream: %s", closeErr.Error())
 		}
 	}()
 
@@ -64,7 +64,7 @@ func routePutFile(c *gin.Context) {
 	// Seek to the start of the range
 	_, err = writeStream.Seek(byteStart, io.SeekStart)
 	if err != nil {
-		log.Printf("Error seeking write stream: %s", err.Error())
+		log.Warnf("Error seeking write stream: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
@@ -72,17 +72,17 @@ func routePutFile(c *gin.Context) {
 	// Write the range to the file
 	written, err := io.CopyN(writeStream, body, byteEnd-byteStart+1)
 	if err != nil {
-		log.Printf("Error writing to file: %s", err.Error())
+		log.Warnf("Error writing to file: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 	if written != byteEnd-byteStart+1 {
-		log.Printf("Incomplete write: expected %d bytes, wrote %d bytes", byteEnd-byteStart+1, written)
+		log.Warnf("Incomplete write: expected %d bytes, wrote %d bytes", byteEnd-byteStart+1, written)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Incomplete write"})
 		return
 	}
 
-	log.Printf("Successfully written %d bytes to %s", written, relativePath)
+	log.Debugf("Successfully written %d bytes to %s", written, relativePath)
 	c.Status(http.StatusAccepted)
 }
 
@@ -101,7 +101,7 @@ func routePostFile(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 			return
 		}
-		log.Printf("Error completing file upload: %s", errStr)
+		log.Warnf("Error completing file upload: %s", errStr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error completing file upload"})
 		return
 	}
@@ -120,7 +120,7 @@ func routeDeleteFile(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 			return
 		}
-		log.Printf("Error deleting file: %s", errStr)
+		log.Warnf("Error deleting file: %s", errStr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting file"})
 		return
 	}

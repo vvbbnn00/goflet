@@ -4,8 +4,8 @@ import (
 	"goflet/storage"
 	"goflet/storage/model"
 	"goflet/util/hash"
+	"goflet/util/log"
 	"goflet/worker"
-	"log"
 	"path/filepath"
 )
 
@@ -36,7 +36,7 @@ func workerFactory() worker.Worker {
 func startAsyncTask(algo func(string) (string, error), path string, channel chan string) {
 	result, err := algo(path)
 	if err != nil {
-		log.Printf("Error hashing file: %s", err.Error())
+		log.Warnf("Error hashing file: %s", err.Error())
 		channel <- ""
 		return
 	}
@@ -70,7 +70,7 @@ func updateFileHash(fsPath string) error {
 		Hash: fileHash,
 	})
 	if err != nil {
-		log.Printf("Error updating file meta: %s", err.Error())
+		log.Warnf("Error updating file meta: %s", err.Error())
 		return err
 	}
 	return nil

@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"log"
+	"goflet/util/log"
 	"sync"
 	"time"
 )
@@ -38,17 +38,17 @@ type Pool struct {
 // work starts the worker and listens for jobs
 func (w *Worker) work(jobChain chan Job, cancelChain <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
-	log.Printf("[Worker] Worker for job %s started", w.JobName)
+	log.Infof("[Worker] Worker for job %s started", w.JobName)
 
 	for {
 		select {
 		case <-cancelChain:
-			log.Printf("[Worker] Worker %s cancelled", w.JobName)
+			log.Infof("[Worker] Worker %s cancelled", w.JobName)
 			return
 		case job := <-jobChain:
 			// Check if the job has exceeded the maximum number of retries
 			if job.RetryCount > maxJobRetries {
-				log.Printf("[Worker] Job %s(%v) failed after %d retries", w.JobName, job.Args, maxJobRetries)
+				log.Warnf("[Worker] Job %s(%v) failed after %d retries", w.JobName, job.Args, maxJobRetries)
 				continue
 			}
 
@@ -57,7 +57,7 @@ func (w *Worker) work(jobChain chan Job, cancelChain <-chan struct{}, wg *sync.W
 				job.RetryCount++
 				backoffDuration := time.Duration(job.RetryCount) * retryDelay // Exponential backoff
 
-				log.Printf("[Worker] Failed to execute job %s(%v): %s, retry %d, wait %d sec",
+				log.Warnf("[Worker] Failed to execute job %s(%v): %s, retry %d, wait %d sec",
 					w.JobName,
 					job.Args,
 					err.Error(),
@@ -67,13 +67,13 @@ func (w *Worker) work(jobChain chan Job, cancelChain <-chan struct{}, wg *sync.W
 				// Before sleep, check if the job has been cancelled
 				select {
 				case <-cancelChain:
-					log.Printf("[Worker] Worker %s cancelled", w.JobName)
+					log.Infof("[Worker] Worker %s cancelled", w.JobName)
 					return
 				default:
 				}
 				time.Sleep(backoffDuration) // Wait before retrying
 
-				log.Printf("[Worker] Retrying job %s, retry %d", w.JobName, job.RetryCount)
+				log.Infof("[Worker] Retrying job %s, retry %d", w.JobName, job.RetryCount)
 
 				// Retry the job
 				go func() {
@@ -84,7 +84,7 @@ func (w *Worker) work(jobChain chan Job, cancelChain <-chan struct{}, wg *sync.W
 					select {
 					case jobChain <- job:
 					case <-cancelChain:
-						log.Printf("[Worker] Worker %s cancelled", w.JobName)
+						log.Infof("[Worker] Worker %s cancelled", w.JobName)
 					}
 				}()
 			}

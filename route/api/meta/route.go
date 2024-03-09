@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
 	"goflet/storage"
-	"log"
+	"goflet/util/log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -27,7 +27,7 @@ func routeGetFileMeta(c *gin.Context) {
 	// Get the file info
 	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
-		log.Printf("Error getting file info: %s", err.Error())
+		log.Debugf("Error getting file info: %s", err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}

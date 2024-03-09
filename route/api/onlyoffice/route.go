@@ -5,8 +5,8 @@ import (
 	"goflet/middleware"
 	"goflet/storage"
 	"goflet/storage/upload"
+	"goflet/util/log"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -60,7 +60,7 @@ func routeUpdateFile(c *gin.Context) {
 	// Download the file from the URL provided by OnlyOffice
 	resp, err := http.Get(o.Url)
 	if err != nil {
-		log.Printf("Error downloading file: %s", err.Error())
+		log.Warnf("Error downloading file: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error downloading file"})
 		return
 	}
@@ -71,7 +71,7 @@ func routeUpdateFile(c *gin.Context) {
 	// Write the downloaded content to the file
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		log.Printf("Error writing downloaded file: %s", err.Error())
+		log.Warnf("Error writing downloaded file: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
@@ -83,7 +83,7 @@ func routeUpdateFile(c *gin.Context) {
 	err = upload.CompleteFileUpload(relativePath)
 	if err != nil {
 		errStr := err.Error()
-		log.Printf("Error completing file upload: %s", errStr)
+		log.Warnf("Error completing file upload: %s", errStr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error completing file upload"})
 		return
 	}
