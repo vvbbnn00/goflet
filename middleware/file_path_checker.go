@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"goflet/storage"
 	"goflet/util"
 	"log"
 )
@@ -25,8 +26,28 @@ func FilePathChecker() gin.HandlerFunc {
 			return
 		}
 
+		relativePath, err := storage.PathToRelativePath(cleanedPath)
+		if err != nil {
+			log.Printf("Error converting to fs path: %s", err.Error())
+			c.JSON(400, gin.H{"error": "Invalid path"})
+			c.Abort()
+			return
+		}
+
+		fsPath, err := storage.RelativeToFsPath(relativePath)
+		if err != nil {
+			log.Printf("Error converting to fs path: %s", err.Error())
+			c.JSON(400, gin.H{"error": "Invalid path"})
+			c.Abort()
+			return
+		}
+
 		// Set the cleaned path in the context
 		c.Set("cleanPath", cleanedPath)
+		// Set the relative path in the context
+		c.Set("relativePath", relativePath)
+		// Set the fs path in the context
+		c.Set("fsPath", fsPath)
 		c.Next()
 	}
 }

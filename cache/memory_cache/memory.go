@@ -1,7 +1,8 @@
-package cache
+package memory_cache
 
 import (
 	"errors"
+	"goflet/cache/model"
 	"reflect"
 	"sync"
 	"time"
@@ -10,7 +11,7 @@ import (
 const garbageCollectionInterval = 10 * time.Second
 
 type valueMemory struct {
-	Type       ValueType
+	Type       model.ValueType
 	Value      interface{}
 	Expiration int       // <= 0 means no expiration
 	LastAccess time.Time // The last access time, used to determine whether the value is expired
@@ -30,26 +31,26 @@ var errInvalidValueType = errors.New("invalid value type")
 var errTypeMismatch = errors.New("type mismatch")
 
 // getValueType returns the value type
-func getValueType(value interface{}) ValueType {
+func getValueType(value interface{}) model.ValueType {
 	if value == nil {
-		return ValueUnknown
+		return model.ValueUnknown
 	}
 
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Int:
-		return ValueInt
+		return model.ValueInt
 	case reflect.String:
-		return ValueString
+		return model.ValueString
 	case reflect.Float64:
-		return ValueFloat
+		return model.ValueFloat
 	case reflect.Bool:
-		return ValueBool
+		return model.ValueBool
 	// case reflect.Slice, reflect.Array:
 	// 	return ValueArray
 	// case reflect.Map:
 	// 	return ValueMap
 	default:
-		return ValueUnknown
+		return model.ValueUnknown
 	}
 }
 
@@ -88,7 +89,7 @@ func (c *MemoryCache) GetInt(key string) (int, error) {
 	if !ok {
 		return 0, errCacheMiss
 	}
-	if value.Type != ValueInt {
+	if value.Type != model.ValueInt {
 		return 0, errTypeMismatch
 	}
 	return value.Value.(int), nil
@@ -100,7 +101,7 @@ func (c *MemoryCache) GetString(key string) (string, error) {
 	if !ok {
 		return "", errCacheMiss
 	}
-	if value.Type != ValueString {
+	if value.Type != model.ValueString {
 		return "", errTypeMismatch
 	}
 	return value.Value.(string), nil
@@ -112,7 +113,7 @@ func (c *MemoryCache) GetFloat(key string) (float64, error) {
 	if !ok {
 		return 0, errCacheMiss
 	}
-	if value.Type != ValueFloat {
+	if value.Type != model.ValueFloat {
 		return 0, errTypeMismatch
 	}
 	return value.Value.(float64), nil
@@ -124,7 +125,7 @@ func (c *MemoryCache) GetBool(key string) (bool, error) {
 	if !ok {
 		return false, errCacheMiss
 	}
-	if value.Type != ValueBool {
+	if value.Type != model.ValueBool {
 		return false, errTypeMismatch
 	}
 	return value.Value.(bool), nil
@@ -148,7 +149,7 @@ func (c *MemoryCache) Set(key string, value interface{}) error {
 // SetEx sets the value to the memory cache with a specific TTL
 func (c *MemoryCache) SetEx(key string, value interface{}, ttl int) error {
 	valueType := getValueType(value)
-	if valueType == ValueUnknown {
+	if valueType == model.ValueUnknown {
 		return errInvalidValueType
 	}
 

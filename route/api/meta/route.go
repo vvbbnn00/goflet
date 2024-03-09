@@ -3,8 +3,7 @@ package meta
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
-	"goflet/service"
-	"goflet/util"
+	"goflet/storage"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -22,11 +21,11 @@ func RegisterRoutes(router *gin.RouterGroup) {
 
 // routeGetFileMeta handler for GET /meta/*path
 func routeGetFileMeta(c *gin.Context) {
-	basePath := util.GetBasePath()
-	cleanPath := c.GetString("cleanPath")
+	fsPath := c.GetString("fsPath")
+	relativePath := c.GetString("relativePath")
 
 	// Get the file info
-	fileInfo, err := service.GetFileInfo(cleanPath)
+	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
 		log.Printf("Error getting file info: %s", err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
@@ -34,7 +33,7 @@ func routeGetFileMeta(c *gin.Context) {
 	}
 
 	// Convert absolute path to relative path
-	fileInfo.FilePath = filepath.Join("/", strings.TrimPrefix(cleanPath, basePath))
+	fileInfo.FilePath = relativePath
 
 	// If windows, replace \ with /
 	if filepath.Separator == '\\' {

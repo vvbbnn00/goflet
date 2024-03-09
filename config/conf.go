@@ -79,6 +79,10 @@ var (
 	GofletCfg GofletConfig
 )
 
+func init() {
+	InitConfig()
+}
+
 // InitConfig initializes the configuration
 func InitConfig() {
 	// Export default config into file if not exists

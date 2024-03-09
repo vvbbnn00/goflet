@@ -1,9 +1,12 @@
-package service
+package hasher
 
 import (
+	"goflet/storage"
+	"goflet/storage/model"
 	"goflet/util/hash"
 	"goflet/worker"
 	"log"
+	"path/filepath"
 )
 
 const (
@@ -23,8 +26,8 @@ func workerFactory() worker.Worker {
 	return worker.Worker{
 		JobName: "HashTask",
 		Do: func(job worker.Job) error {
-			args := job.Args.([2]string)
-			return updateFileHash(args[0], args[1])
+			args := job.Args.([1]string)
+			return updateFileHash(args[0])
 		},
 	}
 }
@@ -40,17 +43,20 @@ func startAsyncTask(algo func(string) (string, error), path string, channel chan
 	channel <- result
 }
 
-// HashFile returns the hash of the file
-func HashFile(path string) FileHash {
+// hashFile returns the hash of the file
+func hashFile(path string) model.FileHash {
 	sha1 := make(chan string)
 	sha256 := make(chan string)
 	md5 := make(chan string)
+
+	// Append the file-append to the path
+	path = filepath.Join(path, model.FileAppend)
 
 	go startAsyncTask(hash.FileSha1, path, sha1)
 	go startAsyncTask(hash.FileSha256, path, sha256)
 	go startAsyncTask(hash.FileMd5, path, md5)
 
-	return FileHash{
+	return model.FileHash{
 		HashSha1:   <-sha1,
 		HashSha256: <-sha256,
 		HashMd5:    <-md5,
@@ -58,9 +64,9 @@ func HashFile(path string) FileHash {
 }
 
 // updateFileHash updates the hash of the file
-func updateFileHash(path string, decodedPath string) error {
-	fileHash := HashFile(path)
-	err := UpdateFileMeta(decodedPath, FileMeta{
+func updateFileHash(fsPath string) error {
+	fileHash := hashFile(fsPath)
+	err := storage.UpdateFileMeta(fsPath, model.FileMeta{
 		Hash: fileHash,
 	})
 	if err != nil {
@@ -71,9 +77,9 @@ func updateFileHash(path string, decodedPath string) error {
 }
 
 // HashFileAsync updates the hash of the file asynchronously
-func HashFileAsync(path string, decodedPath string) {
+func HashFileAsync(fsPath string) {
 	hashTaskPool.JobChain <- worker.Job{
 		RetryCount: 0,
-		Args:       [2]string{path, decodedPath},
+		Args:       [1]string{fsPath},
 	}
 }

@@ -3,8 +3,8 @@ package image
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
-	"goflet/service"
-	"goflet/service/image"
+	"goflet/storage"
+	"goflet/storage/image"
 	"goflet/util"
 	"io"
 	"log"
@@ -27,10 +27,10 @@ func RegisterRoutes(router *gin.RouterGroup) {
 
 // routeGetImage handler for GET /image/*path
 func routeGetImage(c *gin.Context) {
-	cleanPath := c.GetString("cleanPath")
+	fsPath := c.GetString("fsPath")
 
 	// Get the file info
-	fileInfo, err := service.GetFileInfo(cleanPath)
+	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
@@ -51,7 +51,7 @@ func routeGetImage(c *gin.Context) {
 	}
 
 	// Check if the file is in the cache
-	cachedFile, err := image.GetFileImageReader(cleanPath, params)
+	cachedFile, err := image.GetFileImageReader(fsPath, params)
 	fileStat, _ := cachedFile.Stat()
 	if err == nil && fileStat.Size() == 0 {
 		_ = cachedFile.Close()
@@ -81,7 +81,7 @@ func routeGetImage(c *gin.Context) {
 	}
 
 	// Get the file read stream
-	file, err := service.GetFileReader(cleanPath)
+	file, err := storage.GetFileReader(fsPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
@@ -105,7 +105,7 @@ func routeGetImage(c *gin.Context) {
 
 	// Save the file to the cache
 	go func() {
-		err := image.SaveFileImageCache(cleanPath, params, *imageProcessed)
+		err := image.SaveFileImageCache(fsPath, params, *imageProcessed)
 		if err != nil {
 			log.Printf("Error saving image cache: %s", err.Error())
 		}

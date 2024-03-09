@@ -3,7 +3,8 @@ package file
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
-	"goflet/service"
+	"goflet/storage"
+	"goflet/storage/upload"
 	"goflet/util"
 	"io"
 	"log"
@@ -26,10 +27,10 @@ func RegisterRoutes(router *gin.Engine) {
 
 // routeGetFile handler for GET /file/*path
 func routeGetFile(c *gin.Context) {
-	cleanPath := c.GetString("cleanPath")
+	fsPath := c.GetString("fsPath")
 
 	// Get the file info
-	fileInfo, err := service.GetFileInfo(cleanPath)
+	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
 		log.Printf("Error getting file info: %s", err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
@@ -46,7 +47,7 @@ func routeGetFile(c *gin.Context) {
 	}
 
 	// Get the file reader
-	file, err := service.GetFileReader(cleanPath)
+	file, err := storage.GetFileReader(fsPath)
 	if err != nil {
 		log.Printf("Error getting file reader: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
@@ -63,7 +64,7 @@ func routeGetFile(c *gin.Context) {
 
 	// Set common headers
 	c.Header("Accept-Ranges", "bytes")
-	c.Header("Content-Disposition", "attachment; filename="+fileInfo.FileName)
+	c.Header("Content-Disposition", "attachment; filename="+fileInfo.FileMeta.FileName)
 	c.Header("Content-Type", fileType)
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Last-Modified", util.Int64ToHeaderDate(fileInfo.LastModified))
@@ -109,7 +110,7 @@ func routeGetFile(c *gin.Context) {
 
 // routePutFile handler for PUT /file/*path
 func routePutFile(c *gin.Context) {
-	cleanPath := c.GetString("cleanPath")
+	relativePath := c.GetString("relativePath")
 
 	// Parse the range
 	byteStart, byteEnd, _, err := util.HeaderParseRangeUpload(c.GetHeader("Content-Range"), c.GetHeader("Content-Length"))
@@ -119,7 +120,7 @@ func routePutFile(c *gin.Context) {
 	}
 
 	// Get the write stream
-	writeStream, err := service.GetTempFileWriteStream(cleanPath)
+	writeStream, err := upload.GetTempFileWriteStream(relativePath)
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "directory_creation" {
@@ -163,15 +164,15 @@ func routePutFile(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Successfully written %d bytes to %s", written, cleanPath)
+	log.Printf("Successfully written %d bytes to %s", written, relativePath)
 	c.Status(http.StatusAccepted)
 }
 
 // routePostFile handler for POST /file/*path
 func routePostFile(c *gin.Context) {
-	cleanPath := c.GetString("cleanPath")
+	relativePath := c.GetString("relativePath")
 
-	err := service.CompleteFileUpload(cleanPath)
+	err := upload.CompleteFileUpload(relativePath)
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "file_not_found" {
@@ -183,14 +184,14 @@ func routePostFile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{})
+	c.Status(http.StatusCreated)
 }
 
 // routeDeleteFile handler for DELETE /file/*path
 func routeDeleteFile(c *gin.Context) {
-	cleanPath := c.GetString("cleanPath")
+	fsPath := c.GetString("fsPath")
 
-	err := service.DeleteFile(cleanPath)
+	err := storage.DeleteFile(fsPath)
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "file_not_found" {

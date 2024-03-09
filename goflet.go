@@ -4,16 +4,11 @@ import (
 	"goflet/config"
 	"goflet/route"
 	"goflet/scheduled_task"
-	"goflet/util"
 	"log"
 )
 
 func main() {
-	config.InitConfig()
-
 	gofletCfg := config.GofletCfg
-
-	util.JwtInit()
 
 	httpConfig := gofletCfg.HTTPConfig
 	router := route.RegisterRoutes()

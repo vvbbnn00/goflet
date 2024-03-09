@@ -3,7 +3,8 @@ package onlyoffice
 import (
 	"github.com/gin-gonic/gin"
 	"goflet/middleware"
-	"goflet/service"
+	"goflet/storage"
+	"goflet/storage/upload"
 	"io"
 	"log"
 	"net/http"
@@ -25,7 +26,8 @@ type onlyOfficeUpdateRequest struct {
 
 // routeUpdateFile handler for POST /onlyoffice/*path
 func routeUpdateFile(c *gin.Context) {
-	cleanPath := c.GetString("cleanPath")
+	fsPath := c.GetString("fsPath")
+	relativePath := c.GetString("relativePath")
 
 	// Bind the JSON
 	o := onlyOfficeUpdateRequest{}
@@ -42,14 +44,14 @@ func routeUpdateFile(c *gin.Context) {
 	}
 
 	// Get the file info
-	_, err = service.GetFileInfo(cleanPath)
+	_, err = storage.GetFileInfo(fsPath)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
 	// Get the file write stream
-	file, err := service.GetTempFileWriteStream(cleanPath)
+	file, err := upload.GetTempFileWriteStream(relativePath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
@@ -78,7 +80,7 @@ func routeUpdateFile(c *gin.Context) {
 	_ = file.Close()
 
 	// Complete the file upload
-	err = service.CompleteFileUpload(cleanPath)
+	err = upload.CompleteFileUpload(relativePath)
 	if err != nil {
 		errStr := err.Error()
 		log.Printf("Error completing file upload: %s", errStr)
