@@ -8,3 +8,4 @@ cert
 *.exe
 winres.json
 *.syso
+/dist

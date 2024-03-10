@@ -1,4 +1,4 @@
-// Package main generates winres.json
+// Package main generates winres.json, modified from: https://github.com/Mrs4s/go-cqhttp/blob/master/winres/gen/json.go
 package main
 
 import (
@@ -16,7 +16,11 @@ const js = `{
     "APP": {
       "0000": [
         "icon.png",
-        "icon16.png"
+        "icon16.png",
+		"icon32.png",
+		"icon64.png",
+		"icon128.png",
+		"icon256.png"
       ]
     }
   },
@@ -24,7 +28,7 @@ const js = `{
     "#1": {
       "0409": {
         "identity": {
-          "name": "go-cqhttp",
+          "name": "goflet",
           "version": "%s"
         },
         "description": "",
