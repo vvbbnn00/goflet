@@ -17,8 +17,6 @@ import (
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes() *gin.Engine {
-	router := gin.Default()
-
 	if config.GofletCfg.Debug {
 		gin.SetMode(gin.DebugMode)
 		gin.DefaultWriter = os.Stdout
@@ -27,6 +25,9 @@ func RegisterRoutes() *gin.Engine {
 		gin.SetMode(gin.ReleaseMode)
 		gin.DefaultWriter = io.Discard
 	}
+
+	// Router should be created after setting the mode
+	router := gin.Default()
 
 	// Log the requests
 	router.Use(middleware.SafeLogger())
