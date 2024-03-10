@@ -1,12 +1,14 @@
 package action
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/log"
-	"net/http"
 )
 
 // OnConflictAction is the action to take when the file already exists
@@ -82,6 +84,11 @@ func preCheckForCopyMoveRoute(c *gin.Context) (*util.Path, *util.Path, bool) {
 	// Check if the target file exists
 	if storage.FileExists(targetPath.FsPath) {
 		switch req.OnConflict {
+		default:
+			fallthrough
+		case OnConflictActionAbort:
+			c.JSON(http.StatusConflict, gin.H{"error": "File already exists"})
+			return nil, nil, false
 		case OnConflictActionOverwrite:
 			// Delete the target file
 			err := storage.DeleteFile(targetPath.FsPath)
@@ -89,11 +96,6 @@ func preCheckForCopyMoveRoute(c *gin.Context) (*util.Path, *util.Path, bool) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting target file"})
 				return nil, nil, false
 			}
-		default:
-			fallthrough
-		case OnConflictActionAbort:
-			c.JSON(http.StatusConflict, gin.H{"error": "File already exists"})
-			return nil, nil, false
 		}
 	}
 

@@ -4,11 +4,12 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/vvbbnn00/goflet/base"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/vvbbnn00/goflet/base"
 )
 
 const js = `{

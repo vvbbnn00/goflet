@@ -18,7 +18,7 @@ import (
 
 const (
 	maxRetryCount = 100          // The maximum number of times to retry the file uploadconst (
-	CachePrefix   = "uploading:" // The cache prefix for the file upload
+	CachePrefix   = "uploading:" // CachePrefix is the cache prefix for the file upload
 )
 
 var (

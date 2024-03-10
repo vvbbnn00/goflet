@@ -2,11 +2,12 @@ package util
 
 import (
 	"errors"
-	"github.com/vvbbnn00/goflet/util/hash"
-	"github.com/vvbbnn00/goflet/util/log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/vvbbnn00/goflet/util/hash"
+	"github.com/vvbbnn00/goflet/util/log"
 
 	"github.com/vvbbnn00/goflet/config"
 )
@@ -26,6 +27,7 @@ func init() {
 	}
 }
 
+// Path is the structure for the file path
 type Path struct {
 	// The absolute path of the file in the file system
 	FsPath string `json:"fsPath"`

@@ -1,11 +1,13 @@
 package action
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/vvbbnn00/goflet/cache"
 	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/util/log"
-	"net/http"
 )
 
 // routeMoveFile handler for POST /action/copy
