@@ -3,6 +3,7 @@ package task
 
 import (
 	"reflect"
+	"time"
 
 	"github.com/vvbbnn00/goflet/config"
 	"github.com/vvbbnn00/goflet/util/log"
@@ -13,11 +14,14 @@ var scheduleToCheck = map[string]func(){
 	"CleanOutdatedFile": CleanOutdatedFile,
 }
 
-// runOneTask runs the task
-func runOneTask(name string, task func()) {
-	log.Infof("Start running task [%s].", name)
-	task()
-	log.Infof("Task [%s] completed.", name)
+// runTask runs the task
+func runTask(name string, task func(), interval int) {
+	for {
+		log.Infof("Start running task [%s].", name)
+		task()
+		log.Infof("Task [%s] completed.", name)
+		time.Sleep(time.Duration(interval) * time.Second) // Sleep for the interval
+	}
 }
 
 // RunScheduledTask runs the scheduled tasks
@@ -42,6 +46,6 @@ func RunScheduledTask() {
 
 		// Run the task in a goroutine
 		log.Infof("Task [%s] is scheduled every %d seconds.", name, value.Int())
-		go runOneTask(name, task)
+		go runTask(name, task, int(value.Int()))
 	}
 }
