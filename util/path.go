@@ -6,8 +6,109 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/vvbbnn00/goflet/util/hash"
+	"github.com/vvbbnn00/goflet/util/log"
+
 	"github.com/vvbbnn00/goflet/config"
 )
+
+var (
+	// BasePath The base path for the file storage
+	BasePath string
+)
+
+// init initializes the storage package
+func init() {
+	BasePath = GetBasePath()
+	// Ensure the base path exists
+	err := os.MkdirAll(BasePath, os.ModePerm)
+	if err != nil {
+		log.Fatalf("Error creating base path: %s", err.Error())
+	}
+}
+
+// Path is the structure for the file path
+type Path struct {
+	// The absolute path of the file in the file system
+	FsPath string `json:"fsPath"`
+	// The relative path of the file
+	RelativePath string `json:"relativePath"`
+	// Cleaned path
+	CleanedPath string `json:"cleanedPath"`
+}
+
+// PathToRelativePath converts the absolute path provided to the relative path
+func PathToRelativePath(path string) (string, error) {
+	if !strings.HasPrefix(path, BasePath) {
+		return "", errors.New("invalid path")
+	}
+
+	// Remove the base path from the path to get the relative path
+	path = path[len(BasePath):]
+	// Replace \ with / to ensure the path is consistent
+	path = filepath.ToSlash(path)
+
+	return path, nil
+}
+
+// RelativeToFsPath converts the relative path provided to the real file system path
+func RelativeToFsPath(path string) (string, error) {
+	// Get the hash of the path
+	pathHash := hash.StringSha3New256(path)
+	// Get Double Index of the hash
+	firstIndex := pathHash[:2]
+	secondIndex := pathHash[2:4]
+
+	// Join the parts to get the real file system path
+	fsPath := filepath.Join(BasePath, firstIndex, secondIndex, pathHash)
+
+	// Add filepath separator to the end of the path to ensure it is a folder
+	if !strings.HasSuffix(fsPath, string(filepath.Separator)) {
+		fsPath += string(filepath.Separator)
+	}
+
+	return fsPath, nil
+}
+
+// FsPathToRelativePath converts the real file system path to the relative path
+func FsPathToRelativePath(fsPath string) string {
+	// Remove the base path from the path to get the relative path
+	path := fsPath[len(BasePath):]
+	// Replace \ with / to ensure the path is consistent
+	path = filepath.ToSlash(path)
+
+	return path
+}
+
+// ParsePath Parse the path and return the absolute and relative paths
+func ParsePath(path string) (*Path, error) {
+	// Ensure the path is valid
+	cleanedPath, err := ClarifyPath(path)
+	if err != nil {
+		log.Debugf("Invalid path: %s, error: %s", path, err.Error())
+		return nil, err
+	}
+
+	// Convert the path to relative path
+	relativePath, err := PathToRelativePath(cleanedPath)
+	if err != nil {
+		log.Debugf("Error converting to fs path: %s", err.Error())
+		return nil, err
+	}
+
+	// Convert the relative path to fs path
+	fsPath, err := RelativeToFsPath(relativePath)
+	if err != nil {
+		log.Debugf("Error converting to fs path: %s", err.Error())
+		return nil, err
+	}
+
+	return &Path{
+		FsPath:       fsPath,
+		RelativePath: relativePath,
+		CleanedPath:  cleanedPath,
+	}, nil
+}
 
 // GetPath Get the absolute path for the file storage
 func GetPath(path string) string {

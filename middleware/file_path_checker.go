@@ -3,7 +3,6 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/vvbbnn00/goflet/storage"
 	"github.com/vvbbnn00/goflet/util"
 	"github.com/vvbbnn00/goflet/util/log"
 )
@@ -19,36 +18,20 @@ func FilePathChecker() gin.HandlerFunc {
 			return
 		}
 
-		cleanedPath, err := util.ClarifyPath(path)
+		pathData, err := util.ParsePath(path)
 		if err != nil {
 			log.Debugf("Invalid path: %s, error: %s", path, err.Error())
-			c.JSON(400, gin.H{"error": "Invalid path"})
-			c.Abort()
-			return
-		}
-
-		relativePath, err := storage.PathToRelativePath(cleanedPath)
-		if err != nil {
-			log.Debugf("Error converting to fs path: %s", err.Error())
-			c.JSON(400, gin.H{"error": "Invalid path"})
-			c.Abort()
-			return
-		}
-
-		fsPath, err := storage.RelativeToFsPath(relativePath)
-		if err != nil {
-			log.Debugf("Error converting to fs path: %s", err.Error())
-			c.JSON(400, gin.H{"error": "Invalid path"})
+			c.JSON(400, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
 
 		// Set the cleaned path in the context
-		c.Set("cleanPath", cleanedPath)
+		c.Set("cleanPath", pathData.CleanedPath)
 		// Set the relative path in the context
-		c.Set("relativePath", relativePath)
+		c.Set("relativePath", pathData.RelativePath)
 		// Set the fs path in the context
-		c.Set("fsPath", fsPath)
+		c.Set("fsPath", pathData.FsPath)
 		c.Next()
 	}
 }

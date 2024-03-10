@@ -22,10 +22,6 @@ import (
 	"github.com/vvbbnn00/goflet/util/log"
 )
 
-const (
-	cachePrefix = "uploading:"
-)
-
 var (
 	uploadPath      string
 	canCreateFolder bool
@@ -76,12 +72,12 @@ func CompleteFileUpload(relativePath string) error {
 	tmpPath := filepath.Join(uploadPath, fileName)
 	c := cache.GetCache()
 	// Ensure the directory exists
-	fsPath, err := storage.RelativeToFsPath(relativePath)
+	fsPath, err := util.RelativeToFsPath(relativePath)
 	if err != nil {
 		return err
 	}
 
-	exists, _ := c.GetBool(cachePrefix + fsPath)
+	exists, _ := c.GetBool(storage.CachePrefix + fsPath)
 	if exists {
 		return errors.New("file_uploading")
 	}
@@ -124,17 +120,17 @@ func CompleteFileUpload(relativePath string) error {
 // completeUpload completes the file upload by renaming the temporary file to the final file
 func completeUpload(fsPath string, tmpPath string, meta model.FileMeta) {
 	c := cache.GetCache()
-	_ = c.SetEx(cachePrefix+fsPath, true, 60)
+	_ = c.SetEx(storage.CachePrefix+fsPath, true, 60)
 
 	defer func() {
-		_ = c.Del(cachePrefix + fsPath)
+		_ = c.Del(storage.CachePrefix + fsPath)
 	}()
 
 	// The target file path
 	filePath := filepath.Join(fsPath, model.FileAppend)
 
 	// Rename the temporary file to the final file
-	err := storage.MoveFile(tmpPath, filePath)
+	err := storage.RenameFile(tmpPath, filePath)
 	if err != nil {
 		log.Warnf("Error moving file: %s", err.Error())
 		return // Give up if the file cannot be moved

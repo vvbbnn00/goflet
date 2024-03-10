@@ -39,6 +39,7 @@ func getValueType(value interface{}) model.ValueType {
 		return model.ValueUnknown
 	}
 
+	//nolint:exhaustive
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Int:
 		return model.ValueInt
