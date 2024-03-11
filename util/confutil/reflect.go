@@ -2,6 +2,7 @@
 package confutil
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -34,8 +35,9 @@ func SetDefaults(config interface{}) {
 					field.SetInt(defaultValue)
 				}
 			}
-		case reflect.Bool:
-			if !field.Bool() {
+		case reflect.Bool, reflect.Ptr:
+			// Should have a better way to parse bool
+			if field.IsNil() {
 				if defaultValue, err := strconv.ParseBool(defaultTag); err == nil {
 					field.SetBool(defaultValue)
 				}
@@ -65,4 +67,40 @@ func SetDefaults(config interface{}) {
 			SetDefaults(field.Addr().Interface())
 		}
 	}
+}
+
+// FormatStruct prints the fields of the struct
+func FormatStruct(s interface{}) string {
+	val := reflect.ValueOf(s).Elem()
+	typ := val.Type()
+
+	var result string
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		fieldName := typ.Field(i).Name
+		var fieldValue string
+
+		//nolint:exhaustive
+		switch field.Kind() {
+		case reflect.Struct:
+			fieldValue = FormatStruct(field.Addr().Interface())
+		case reflect.Ptr:
+			if !field.IsNil() {
+				fieldValue = fmt.Sprintf("%v", field.Elem())
+			} else {
+				fieldValue = "<nil>"
+			}
+		default:
+			fieldValue = fmt.Sprintf("%v", field)
+		}
+
+		// If the field value contains newline, add indentation
+		if strings.Contains(fieldValue, "\n") {
+			fieldValue = strings.ReplaceAll(fieldValue, "\n", "\n  ")
+			fieldValue = "{\n  " + fieldValue + "\b\b}"
+		}
+
+		result += fmt.Sprintf("%s: %s\n", fieldName, fieldValue)
+	}
+	return result
 }

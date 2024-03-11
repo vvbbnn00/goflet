@@ -112,7 +112,7 @@ func SetCommonHeaders(c *gin.Context, fileInfo *model.FileInfo) {
 	c.Header("ETag", generateETag(fileInfo))
 
 	// Set the cache control header
-	if config.GofletCfg.HTTPConfig.ClientCache.Enabled {
+	if *config.GofletCfg.HTTPConfig.ClientCache.Enabled {
 		c.Header("Cache-Control", "max-age="+strconv.Itoa(config.GofletCfg.HTTPConfig.ClientCache.MaxAge)) // Set the max age
 	}
 }

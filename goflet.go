@@ -39,7 +39,7 @@ func main() {
 	endpoint := gofletCfg.GetEndpoint()
 
 	// Start the HTTP and HTTPS servers
-	if httpConfig.HTTPSConfig.Enabled {
+	if *httpConfig.HTTPSConfig.Enabled {
 		go func() {
 			err := router.RunTLS(endpoint, httpConfig.HTTPSConfig.Cert, httpConfig.HTTPSConfig.Key)
 			if err != nil {

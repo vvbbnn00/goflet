@@ -27,11 +27,11 @@ const (
 
 // GofletConfig contains the configuration for the application
 type GofletConfig struct {
-	Debug          bool `json:"debug" default:"false"`         // Enable debug mode
-	SwaggerEnabled bool `json:"swaggerEnabled" default:"true"` // Enable swagger doc
+	Debug          *bool `json:"debug" default:"false"`         // Enable debug mode
+	SwaggerEnabled *bool `json:"swaggerEnabled" default:"true"` // Enable swagger doc
 	LogConfig      struct {
 		// Log configuration
-		Enabled bool   `json:"enabled" default:"true"` // Enable log
+		Enabled *bool  `json:"enabled" default:"true"` // Enable log
 		Level   string `json:"level" default:"info"`   // The log level
 	} `json:"logConfig"`
 	HTTPConfig struct {
@@ -39,19 +39,19 @@ type GofletConfig struct {
 		Port int    `json:"port" default:"8080"`    // The port to bind the server
 		Cors struct {
 			// CORS configuration
-			Enabled bool     `json:"enabled" default:"true"`                     // Enable CORS
+			Enabled *bool    `json:"enabled" default:"true"`                     // Enable CORS
 			Origins []string `json:"origins" default:"*"`                        // The list of allowed origins
 			Methods []string `json:"methods" default:"GET,POST,PUT,HEAD,DELETE"` // The list of allowed methods
 			Headers []string `json:"headers"`                                    // The list of allowed headers
 		} `json:"cors"`
 		ClientCache struct {
 			// Client cache configuration
-			Enabled bool `json:"enabled" default:"true"` // Enable client cache
-			MaxAge  int  `json:"maxAge" default:"3600"`  // The maximum age of the client cache
+			Enabled *bool `json:"enabled" default:"true"` // Enable client cache
+			MaxAge  int   `json:"maxAge" default:"3600"`  // The maximum age of the client cache
 		} `json:"clientCache"`
 		HTTPSConfig struct {
 			// HTTPS configuration
-			Enabled bool   `json:"enabled" default:"false"` // Enable HTTPS
+			Enabled *bool  `json:"enabled" default:"false"` // Enable HTTPS
 			Cert    string `json:"cert"`                    // The certificate file
 			Key     string `json:"key"`                     // The key file
 		} `json:"httpsConfig"`
@@ -60,7 +60,7 @@ type GofletConfig struct {
 		// File configuration
 		BaseFileStoragePath string `json:"baseFileStoragePath" default:"data"` // The base path where the files will be stored
 		UploadPath          string `json:"uploadPath" default:"upload"`        // The path where the files will be temporarily stored before moving to the base path
-		AllowFolderCreation bool   `json:"allowFolderCreation" default:"true"` // Allow the creation of folders, otherwise the files will be stored in the base path
+		AllowFolderCreation *bool  `json:"allowFolderCreation" default:"true"` // Allow the creation of folders, otherwise the files will be stored in the base path
 		UploadLimit         int64  `json:"uploadLimit" default:"1073741824"`   // The maximum size of the file to be uploaded
 		UploadTimeout       int    `json:"uploadTimeout" default:"7200"`       // The maximum time to wait for the file to be uploaded
 		MaxPostSize         int64  `json:"maxPostSize" default:"20971520"`     // The maximum size of the post request
@@ -79,7 +79,7 @@ type GofletConfig struct {
 		DefaultFormat  string   `json:"defaultFormat" default:"png"` // The default format for the image
 		AllowedFormats []string `json:"allowedFormats"`              // The list of allowed formats for the image
 
-		StrictMode   bool  `json:"strictMode" default:"true"` // If true, the image size will only accept the allowed sizes
+		StrictMode   *bool `json:"strictMode" default:"true"` // If true, the image size will only accept the allowed sizes
 		AllowedSizes []int `json:"allowedSizes"`              // The list of allowed sizes for the image, like 32, 64, 128, 256
 
 		MaxWidth    int   `json:"maxWidth" default:"4096"`        // The maximum width of the image
@@ -88,7 +88,7 @@ type GofletConfig struct {
 	} `json:"imageConfig"`
 	JWTConfig struct {
 		// JWT configuration
-		Enabled   bool   `json:"enabled" default:"true"`    // Enable JWT
+		Enabled   *bool  `json:"enabled" default:"true"`    // Enable JWT
 		Algorithm string `json:"algorithm" default:"HS256"` // The algorithm to be used for the JWT
 		Security  struct {
 			// Security configuration
@@ -153,14 +153,14 @@ func InitConfig() {
 	confutil.SetDefaults(&GofletCfg)
 
 	// Set the default value for the cache type
-	if !GofletCfg.JWTConfig.Enabled {
+	if !*GofletCfg.JWTConfig.Enabled {
 		fmt.Println("[WARN] JWT is disabled, the security of the application is not guaranteed.")
 	}
 
 	// Print the configuration if the debug mode is enabled
-	if GofletCfg.Debug {
+	if *GofletCfg.Debug {
 		fmt.Println("[WARN] Debug mode is enabled, the application is not suitable for production.")
-		fmt.Printf("%+v\n", GofletCfg)
+		fmt.Printf("[Config]\n%s\n", confutil.FormatStruct(&GofletCfg))
 	}
 }
 

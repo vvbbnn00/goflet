@@ -30,7 +30,7 @@ var (
 // init initializes the upload package
 func init() {
 	uploadPath = util.GetUploadPath()
-	canCreateFolder = config.GofletCfg.FileConfig.AllowFolderCreation
+	canCreateFolder = *config.GofletCfg.FileConfig.AllowFolderCreation
 
 	// Ensure the upload path exists
 	err := os.MkdirAll(uploadPath, os.ModePerm)

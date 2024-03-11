@@ -44,7 +44,7 @@ func init() {
 
 	log.SetFlags(0) // Disable the default logger data
 	conf := config.GofletCfg.LogConfig
-	enabled = conf.Enabled
+	enabled = *conf.Enabled
 	switch conf.Level {
 	case "debug":
 		level = DebugLevel
