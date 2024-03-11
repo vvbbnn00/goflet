@@ -28,6 +28,19 @@ type onlyOfficeUpdateRequest struct {
 }
 
 // routeUpdateFile handler for POST /onlyoffice/*path
+// @Summary      OnlyOffice Callback
+// @Description  OnlyOffice callback for file updates, when the status is 2, the file has been updated, {path} should be the relative path of the file, starting from the root directory, e.g. /onlyoffice/path/to/file.txt
+// @Tags         OnlyOffice
+// @Accept       json
+// @Produce      json
+// @Param        path path string true "File path"
+// @Param        body body onlyOfficeUpdateRequest true "OnlyOffice update request"
+// @Success      200  {object} string	"OK"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /api/onlyoffice/{path} [post]
+// @Security	 Authorization
 func routeUpdateFile(c *gin.Context) {
 	fsPath := c.GetString("fsPath")
 	relativePath := c.GetString("relativePath")

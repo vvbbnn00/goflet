@@ -27,6 +27,24 @@ func RegisterRoutes(router *gin.RouterGroup) {
 }
 
 // routeGetImage handler for GET /image/*path
+// @Summary      Get Image
+// @Description  Get processed image, {path} should be the relative path of the file, starting from the root directory, e.g. /image/path/to/image.jpg
+// @Tags         Image
+// @Produce      image/jpeg, image/png, image/gif
+// @Param        path path string true "File path"
+// @Param        w query int false "Width"
+// @Param        h query int false "Height"
+// @Param        q query int false "Quality, 0-100"
+// @Param        f query string false "Format" Enums(jpg, png, gif)
+// @Param        a query int false "Angle, 0-360"
+// @Param        s query string false "Scale type" Enums(fit, fill, resize, fit_width, fit_height)
+// @Success      200  {object} string	"OK"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found"
+// @Failure      413  {object} string	"File too large"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /api/image/{path} [get]
+// @Security	 Authorization
 func routeGetImage(c *gin.Context) {
 	fsPath := c.GetString("fsPath")
 

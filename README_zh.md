@@ -96,7 +96,7 @@ Goflet的配置文件是`goflet.json`，在初次运行Goflet时，它会自动�
     // 日志级别(debug, info, warn, error, fatal)
     "level": "info"
   },
-  // 是否开启Swagger文档，未实装
+  // 是否开启Swagger文档
   "swaggerEnabled": true,
   // HTTP服务配置
   "httpConfig": {
@@ -227,15 +227,9 @@ Goflet的配置文件是`goflet.json`，在初次运行Goflet时，它会自动�
 
 ## 📝 API文档
 
-文档尚未完成，不过这里提供了目前版本下，Goflet的API列表。
+Goflet的API文档是通过Swagger生成的，您可以在`http://<host>:<port>/swagger/index.html`中查看API文档。
 
-### 接口列表
-
-- [HEAD/GET/PUT/POST/DELETE] /file/{path}
-- [GET] /api/meta/{path}
-- [GET] /api/image/{path}?w={width}&h={height}&f={format}&q={quality}&a={angle}&s={scaleType:
-  fit,fill,resize,fit_width,fit_height}
-- [POST] /api/onlyoffice/{path}
+若您不想要开启Swagger文档，您可以在`goflet.json`中将`swaggerEnabled`设置为`false`。
 
 ### 鉴权方式
 

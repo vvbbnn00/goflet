@@ -30,13 +30,27 @@ var (
 // init initializes the upload package
 func init() {
 	uploadPath = util.GetUploadPath()
-	canCreateFolder = config.GofletCfg.FileConfig.AllowFolderCreation
+	canCreateFolder = *config.GofletCfg.FileConfig.AllowFolderCreation
 
 	// Ensure the upload path exists
 	err := os.MkdirAll(uploadPath, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
+}
+
+// GetTempFilePath Get the temporary file path
+func GetTempFilePath(relativePath string) string {
+	fileName := hash.StringSha3New256(relativePath) // Get the hash of the path
+	tmpPath := filepath.Join(uploadPath, fileName)
+	return tmpPath
+}
+
+// RemoveTempFile Remove the temporary file
+func RemoveTempFile(relativePath string) error {
+	tmpPath := GetTempFilePath(relativePath)
+	err := os.Remove(tmpPath)
+	return err
 }
 
 // GetTempFileWriteStream Get a write stream for the temporary file
@@ -47,8 +61,7 @@ func GetTempFileWriteStream(relativePath string) (*os.File, error) {
 		return nil, errors.New("directory_creation")
 	}
 
-	fileName := hash.StringSha3New256(relativePath) // Get the hash of the path
-	tmpPath := filepath.Join(uploadPath, fileName)
+	tmpPath := GetTempFilePath(relativePath)
 
 	// Ensure the directory exists
 	dir = filepath.Dir(tmpPath)

@@ -78,7 +78,7 @@ func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
 	if width := query.Get("w"); width != "" {
 		params.Width, _ = strconv.Atoi(width)
 	}
-	if conf.StrictMode && !in(params.Width, conf.AllowedSizes) {
+	if *conf.StrictMode && !in(params.Width, conf.AllowedSizes) {
 		params.Width = 0
 	} else {
 		params.Width = max(params.Width, 0)
@@ -87,7 +87,7 @@ func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
 	if height := query.Get("h"); height != "" {
 		params.Height, _ = strconv.Atoi(height)
 	}
-	if conf.StrictMode && !in(params.Height, conf.AllowedSizes) {
+	if *conf.StrictMode && !in(params.Height, conf.AllowedSizes) {
 		params.Height = 0
 	} else {
 		params.Height = max(params.Height, 0)

@@ -11,6 +11,19 @@ import (
 )
 
 // routeMoveFile handler for POST /action/copy
+// @Summary      Move File
+// @Description  Move a file from one location to another, the performance of moving is better than copying.
+// @Tags         Action
+// @Accept       json
+// @Produce      json
+// @Param        body body CopyMoveFileRequest true "Request body"
+// @Success      200  {object} string	"OK"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found"
+// @Failure      409  {object} string	"File exists"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /api/action/move [post]
+// @Security	 Authorization
 func routeMoveFile(c *gin.Context) {
 	sourcePath, targetPath, ok := preCheckForCopyMoveRoute(c)
 	if !ok {

@@ -6,6 +6,12 @@ import (
 	"os"
 	"time"
 
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"github.com/vvbbnn00/goflet/base"
+	"github.com/vvbbnn00/goflet/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -17,7 +23,7 @@ import (
 
 // RegisterRoutes load all the enabled routes for the application
 func RegisterRoutes() *gin.Engine {
-	if config.GofletCfg.Debug {
+	if *config.GofletCfg.Debug {
 		gin.SetMode(gin.DebugMode)
 		gin.DefaultWriter = os.Stdout
 	} else {
@@ -29,12 +35,15 @@ func RegisterRoutes() *gin.Engine {
 	// Router should be created after setting the mode
 	router := gin.Default()
 
+	// Set the max POST data size
+	router.MaxMultipartMemory = config.GofletCfg.FileConfig.MaxPostSize
+
 	// Log the requests
 	router.Use(middleware.SafeLogger())
 
 	// Enable CORS
 	corsConfig := config.GofletCfg.HTTPConfig.Cors
-	if corsConfig.Enabled {
+	if *corsConfig.Enabled {
 		router.Use(cors.New(cors.Config{
 			AllowOrigins:     corsConfig.Origins,
 			AllowMethods:     corsConfig.Methods,
@@ -47,6 +56,12 @@ func RegisterRoutes() *gin.Engine {
 	// Register the routes
 	file.RegisterRoutes(router)
 	api.RegisterRoutes(router)
+
+	// Enable swagger doc if it is enabled
+	if *config.GofletCfg.SwaggerEnabled {
+		docs.SwaggerInfo.Version = base.Version
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	return router
 }
