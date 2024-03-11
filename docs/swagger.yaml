@@ -582,6 +582,8 @@ paths:
           description: Internal server error
           schema:
             type: string
+      security:
+      - Authorization: []
       summary: Cancel Upload
       tags:
       - Upload

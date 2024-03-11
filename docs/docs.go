@@ -806,6 +806,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
                 "description": "Cancel an upload session, {path} should be the relative path of the file, starting from the root directory, e.g. /upload/path/to/file.txt",
                 "tags": [
                     "Upload"
