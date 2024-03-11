@@ -1,6 +1,6 @@
 {
   "debug": false,
-  "swaggerDocEnabled": true,
+  "swaggerEnabled": true,
   "logConfig": {
     "enabled": true,
     "level": "info"

@@ -104,7 +104,7 @@ Below is a detailed explanation of the goflet.json configuration file:
     // Log level (debug, info, warn, error, fatal)
     "level": "info"
   },
-  // Whether to enable Swagger documentation, not implemented
+  // Whether to enable Swagger documentation
   "swaggerEnabled": true,
   // HTTP service configuration
   "httpConfig": {
@@ -235,19 +235,15 @@ Below is a detailed explanation of the goflet.json configuration file:
 
 ## 📝 API Documentation
 
-The documentation is not yet complete, but here is a list of APIs for the current version of Goflet.
+The integrated Swagger documentation can be accessed at `http://<host>:<port>/swagger/index.html`. You can use it to
+easily understand and use Goflet's API.
 
-### Interface List
-
-- [HEAD/GET/PUT/POST/DELETE] /file/{path}
-- [GET] /api/meta/{path}
-- [GET] /api/image/{path}?w={width}&h={height}&f={format}&q={quality}&a={angle}&s={scaleType:
-  fit,fill,resize,fit_width,fit_height}
-- [POST] /api/onlyoffice/{path}
+If you want to disable the Swagger documentation, you can set `swaggerEnabled` to `false` in `goflet.json`.
 
 ### Authentication Method
 
-Goflet's authentication method is JWT. You can configure the JWT-related parameters in `goflet.json`. If you are deploying
+Goflet's authentication method is JWT. You can configure the JWT-related parameters in `goflet.json`. If you are
+deploying
 on the public network, it is strongly recommended that you enable JWT.
 
 ### JWT Format Explanation
