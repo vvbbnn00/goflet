@@ -112,6 +112,7 @@ func routePostUpload(c *gin.Context) {
 // @Failure      404  {object} string	"Upload session not found"
 // @Failure      500  {object} string	"Internal server error"
 // @Router       /upload/{path} [delete]
+// @Security	 Authorization
 func routeDeleteUpload(c *gin.Context) {
 	relativePath := c.GetString("relativePath")
 	err := upload.RemoveTempFile(relativePath)
