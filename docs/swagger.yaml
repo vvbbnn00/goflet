@@ -1,0 +1,591 @@
+basePath: /
+definitions:
+  action.CopyMoveFileRequest:
+    properties:
+      onConflict:
+        allOf:
+        - $ref: '#/definitions/action.OnConflictAction'
+        description: OnConflict is the action to take when the file already exists
+      sourcePath:
+        description: SourcePath is the path of the file to copy
+        type: string
+      targetPath:
+        description: TargetPath is the path where the file will be copied
+        type: string
+    required:
+    - onConflict
+    - sourcePath
+    - targetPath
+    type: object
+  action.CreateFileRequest:
+    properties:
+      path:
+        description: Path is the path where the file will be created
+        type: string
+    required:
+    - path
+    type: object
+  action.OnConflictAction:
+    enum:
+    - overwrite
+    - abort
+    type: string
+    x-enum-varnames:
+    - OnConflictActionOverwrite
+    - OnConflictActionAbort
+  model.FileHash:
+    properties:
+      md5:
+        type: string
+      sha1:
+        type: string
+      sha256:
+        type: string
+    type: object
+  model.FileInfo:
+    properties:
+      fileMeta:
+        allOf:
+        - $ref: '#/definitions/model.FileMeta'
+        description: The metadata of the file
+      filePath:
+        description: Relative path to the base file storage path
+        type: string
+      fileSize:
+        description: The size of the file
+        type: integer
+      lastModified:
+        description: The last modified time of the file
+        type: integer
+    type: object
+  model.FileMeta:
+    properties:
+      fileName:
+        description: The name of the file
+        type: string
+      hash:
+        allOf:
+        - $ref: '#/definitions/model.FileHash'
+        description: The hash of the file
+      mimeType:
+        description: The mime type of the file
+        type: string
+      relativePath:
+        description: The relative path to the base file storage path
+        type: string
+      uploadedAt:
+        description: The time the file was uploaded
+        type: integer
+    type: object
+  onlyoffice.onlyOfficeUpdateRequest:
+    properties:
+      status:
+        description: 2 for update
+        type: integer
+      url:
+        description: The URL of the file
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+info:
+  contact:
+    email: vvbbnn00@gmail.com
+    name: vvbbnn00
+    url: https://github.com/vvbbnn00/goflet
+  description: Goflet is a lightweight file upload and download service written in
+    Go.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: GoFlet API
+paths:
+  /api/action/copy:
+    post:
+      consumes:
+      - application/json
+      description: Copy a file from one location to another, if you want to move a
+        file, use the move action instead.
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/action.CopyMoveFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "409":
+          description: File exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Copy File
+      tags:
+      - Action
+  /api/action/create:
+    post:
+      consumes:
+      - application/json
+      description: Create an empty file at the specified path, if the file already
+        exists, the operation will fail.
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/action.CreateFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "409":
+          description: File exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Create File
+      tags:
+      - Action
+  /api/action/move:
+    post:
+      consumes:
+      - application/json
+      description: Move a file from one location to another, the performance of moving
+        is better than copying.
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/action.CopyMoveFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "409":
+          description: File exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Move File
+      tags:
+      - Action
+  /api/image/{path}:
+    get:
+      description: Get processed image, {path} should be the relative path of the
+        file, starting from the root directory, e.g. /image/path/to/image.jpg
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Width
+        in: query
+        name: w
+        type: integer
+      - description: Height
+        in: query
+        name: h
+        type: integer
+      - description: Quality, 0-100
+        in: query
+        name: q
+        type: integer
+      - description: Format
+        enum:
+        - jpg
+        - png
+        - gif
+        in: query
+        name: f
+        type: string
+      - description: Angle, 0-360
+        in: query
+        name: a
+        type: integer
+      - description: Scale type
+        enum:
+        - fit
+        - fill
+        - resize
+        - fit_width
+        - fit_height
+        in: query
+        name: s
+        type: string
+      produces:
+      - image/jpeg
+      - ' image/png'
+      - ' image/gif'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "413":
+          description: File too large
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Get Image
+      tags:
+      - Image
+  /api/meta/{path}:
+    get:
+      description: Get the file meta data, {path} should be the relative path of the
+        file, starting from the root directory, e.g. /meta/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FileInfo'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Get File Meta
+      tags:
+      - File
+  /api/onlyoffice/{path}:
+    post:
+      consumes:
+      - application/json
+      description: OnlyOffice callback for file updates, when the status is 2, the
+        file has been updated, {path} should be the relative path of the file, starting
+        from the root directory, e.g. /onlyoffice/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: OnlyOffice update request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/onlyoffice.onlyOfficeUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: OnlyOffice Callback
+      tags:
+      - OnlyOffice
+  /file/{path}:
+    delete:
+      description: Delete a file by path, {path} should be the relative path of the
+        file, starting from the root directory, e.g. /file/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Deleted
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found or upload not started
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Delete File
+      tags:
+      - File
+    get:
+      description: Download a file by path, supports range requests, {path} should
+        be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: max-age=3600
+              type: string
+            Content-Disposition:
+              description: attachment; filename=file.txt
+              type: string
+            Content-Length:
+              description: "1024"
+              type: string
+            Content-Type:
+              description: application/octet-stream
+              type: string
+            ETag:
+              description: 686897696a7c876b7e
+              type: string
+            Last-Modified:
+              description: Mon, 02 Jan 2006 15:04:05 GMT
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: File Download
+      tags:
+      - File
+    head:
+      description: Download a file by path, supports range requests, {path} should
+        be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: max-age=3600
+              type: string
+            Content-Disposition:
+              description: attachment; filename=file.txt
+              type: string
+            Content-Length:
+              description: "1024"
+              type: string
+            Content-Type:
+              description: application/octet-stream
+              type: string
+            ETag:
+              description: 686897696a7c876b7e
+              type: string
+            Last-Modified:
+              description: Mon, 02 Jan 2006 15:04:05 GMT
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: File Download
+      tags:
+      - File
+    post:
+      description: Complete an upload session with a partial file upload. You should
+        first upload the file with a PUT request, then complete the upload with a
+        POST request, {path} should be the relative path of the file, starting from
+        the root directory, e.g. /file/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: File not found or upload not started
+          schema:
+            type: string
+        "409":
+          description: File completion in progress
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Complete File Upload
+      tags:
+      - File
+    put:
+      consumes:
+      - '*/*'
+      description: Create an upload session with a partial file upload, supports range
+        requests, {path} should be the relative path of the file, starting from the
+        root directory, e.g. /file/path/to/file.txt
+      parameters:
+      - description: File path
+        in: path
+        name: path
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "403":
+          description: Directory creation not allowed
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - Authorization: []
+      summary: Partial File Upload
+      tags:
+      - File
+securityDefinitions:
+  Authorization:
+    description: 'You need to provide a valid jwt token in the header, in headers,
+      you should provide a key-value pair like this: Authorization: Bearer xxxxxx;
+      The token has the same effect as the token in the query string, but it is more
+      secure than the token in the query string. Or you can just provide the token
+      in the query string, like this: ?token=xxxxxx. More info about jwt: https://github.com/vvbbnn00/goflet?tab=readme-ov-file#authentication-method'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

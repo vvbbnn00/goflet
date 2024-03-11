@@ -30,6 +30,17 @@ func RegisterRoutes(router *gin.Engine) {
 }
 
 // routePutFile handler for PUT /file/*path
+// @Summary      Partial File Upload
+// @Description  Create an upload session with a partial file upload, supports range requests, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
+// @Tags         File
+// @Accept       */*
+// @Param        path path string true "File path"
+// @Success      202  {object} string	"Accepted"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      403  {object} string	"Directory creation not allowed"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /file/{path} [put]
+// @Security	 Authorization
 func routePutFile(c *gin.Context) {
 	relativePath := c.GetString("relativePath")
 
@@ -90,6 +101,17 @@ func routePutFile(c *gin.Context) {
 }
 
 // routePostFile handler for POST /file/*path
+// @Summary      Complete File Upload
+// @Description  Complete an upload session with a partial file upload. You should first upload the file with a PUT request, then complete the upload with a POST request, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
+// @Tags         File
+// @Param        path path string true "File path"
+// @Success      201  {object} string	"Created"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found or upload not started"
+// @Failure      409  {object} string	"File completion in progress"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /file/{path} [post]
+// @Security	 Authorization
 func routePostFile(c *gin.Context) {
 	relativePath := c.GetString("relativePath")
 
@@ -113,6 +135,16 @@ func routePostFile(c *gin.Context) {
 }
 
 // routeDeleteFile handler for DELETE /file/*path
+// @Summary      Delete File
+// @Description  Delete a file by path, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
+// @Tags         File
+// @Param        path path string true "File path"
+// @Success      204  {object} string	"Deleted"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found or upload not started"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /file/{path} [delete]
+// @Security	 Authorization
 func routeDeleteFile(c *gin.Context) {
 	fsPath := c.GetString("fsPath")
 
@@ -128,5 +160,5 @@ func routeDeleteFile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{})
+	c.Status(http.StatusNoContent)
 }

@@ -17,6 +17,18 @@ type CreateFileRequest struct {
 }
 
 // routeCreateFile handler for POST /action/create
+// @Summary      Create File
+// @Description  Create an empty file at the specified path, if the file already exists, the operation will fail.
+// @Tags         Action
+// @Accept       json
+// @Produce      json
+// @Param        body body CreateFileRequest true "Request body"
+// @Success      200  {object} string	"OK"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      409  {object} string	"File exists"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /api/action/create [post]
+// @Security	 Authorization
 func routeCreateFile(c *gin.Context) {
 	// Get the request body
 	var req CreateFileRequest

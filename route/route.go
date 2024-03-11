@@ -6,6 +6,12 @@ import (
 	"os"
 	"time"
 
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"github.com/vvbbnn00/goflet/base"
+	"github.com/vvbbnn00/goflet/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -47,6 +53,12 @@ func RegisterRoutes() *gin.Engine {
 	// Register the routes
 	file.RegisterRoutes(router)
 	api.RegisterRoutes(router)
+
+	// Enable swagger doc if it is enabled
+	if config.GofletCfg.SwaggerDocEnabled {
+		docs.SwaggerInfo.Version = base.Version
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	return router
 }

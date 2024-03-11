@@ -25,8 +25,9 @@ const (
 
 // GofletConfig contains the configuration for the application
 type GofletConfig struct {
-	Debug     bool `json:"debug" default:"false"` // Enable debug mode
-	LogConfig struct {
+	Debug             bool `json:"debug" default:"false"`            // Enable debug mode
+	SwaggerDocEnabled bool `json:"swaggerDocEnabled" default:"true"` // Enable swagger doc
+	LogConfig         struct {
 		// Log configuration
 		Enabled bool   `json:"enabled" default:"true"` // Enable log
 		Level   string `json:"level" default:"info"`   // The log level

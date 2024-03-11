@@ -9,6 +9,25 @@ import (
 	"github.com/vvbbnn00/goflet/util/log"
 )
 
+// @title           GoFlet API
+// @description     Goflet is a lightweight file upload and download service written in Go.
+
+// @contact.name   vvbbnn00
+// @contact.url    https://github.com/vvbbnn00/goflet
+// @contact.email  vvbbnn00@gmail.com
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @BasePath  /
+
+// @securityDefinitions.apikey Authorization
+// @in header
+// @name Authorization
+// @description You need to provide a valid jwt token in the header, in headers, you should provide a key-value pair like this: Authorization: Bearer xxxxxx; The token has the same effect as the token in the query string, but it is more secure than the token in the query string. Or you can just provide the token in the query string, like this: ?token=xxxxxx. More info about jwt: https://github.com/vvbbnn00/goflet?tab=readme-ov-file#authentication-method
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	base.PrintBanner()
 

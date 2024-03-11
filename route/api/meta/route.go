@@ -23,6 +23,17 @@ func RegisterRoutes(router *gin.RouterGroup) {
 }
 
 // routeGetFileMeta handler for GET /meta/*path
+// @Summary      Get File Meta
+// @Description  Get the file meta data, {path} should be the relative path of the file, starting from the root directory, e.g. /meta/path/to/file.txt
+// @Tags         File
+// @Produce      json
+// @Param        path path string true "File path"
+// @Success      200  {object} model.FileInfo	"OK"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found"
+// @Failure      500  {object} string	"Internal server error"
+// @Router       /api/meta/{path} [get]
+// @Security	 Authorization
 func routeGetFileMeta(c *gin.Context) {
 	fsPath := c.GetString("fsPath")
 	relativePath := c.GetString("relativePath")

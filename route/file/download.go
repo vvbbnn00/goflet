@@ -17,6 +17,25 @@ import (
 )
 
 // routeGetFile handles GET and HEAD requests for /file/*path
+// @Summary      File Download
+// @Description  Download a file by path, supports range requests, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
+// @Tags         File
+// @Produce      application/octet-stream
+// @Success      200  {object} string	"OK"
+// @Failure      400  {object} string	"Bad request"
+// @Failure      404  {object} string	"File not found"
+// @Failure      500  {object} string	"Internal server error"
+// @Param        path path string true "File path"
+// @Router       /file/{path} [get]
+// @Router       /file/{path} [head]
+// @Header 200,206 {string} Content-Type "application/octet-stream"
+// @Header 200,206 {string} Content-Disposition "attachment; filename=file.txt"
+// @Header 200,206 {string} Last-Modified "Mon, 02 Jan 2006 15:04:05 GMT"
+// @Header 200,206 {string} ETag "686897696a7c876b7e"
+// @Header 200,206 {string} Cache-Control "max-age=3600"
+// @Header 200,206 {string} Content-Length "1024"
+// @Header 206 {string} Content-Range "bytes 0-1023/2048"
+// @Security	 Authorization
 func routeGetFile(c *gin.Context) {
 	fsPath := c.GetString("fsPath")
 
