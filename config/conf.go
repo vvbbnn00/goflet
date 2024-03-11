@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/vvbbnn00/goflet/util/confutil"
 )
 
 // PathOfConfig is the path of the configuration file
@@ -37,10 +39,10 @@ type GofletConfig struct {
 		Port int    `json:"port" default:"8080"`    // The port to bind the server
 		Cors struct {
 			// CORS configuration
-			Enabled bool     `json:"enabled" default:"true"` // Enable CORS
-			Origins []string `json:"origins"`                // The list of allowed origins
-			Methods []string `json:"methods"`                // The list of allowed methods
-			Headers []string `json:"headers"`                // The list of allowed headers
+			Enabled bool     `json:"enabled" default:"true"`                     // Enable CORS
+			Origins []string `json:"origins" default:"*"`                        // The list of allowed origins
+			Methods []string `json:"methods" default:"GET,POST,PUT,HEAD,DELETE"` // The list of allowed methods
+			Headers []string `json:"headers"`                                    // The list of allowed headers
 		} `json:"cors"`
 		ClientCache struct {
 			// Client cache configuration
@@ -61,6 +63,7 @@ type GofletConfig struct {
 		AllowFolderCreation bool   `json:"allowFolderCreation" default:"true"` // Allow the creation of folders, otherwise the files will be stored in the base path
 		UploadLimit         int64  `json:"uploadLimit" default:"1073741824"`   // The maximum size of the file to be uploaded
 		UploadTimeout       int    `json:"uploadTimeout" default:"7200"`       // The maximum time to wait for the file to be uploaded
+		MaxPostSize         int64  `json:"maxPostSize" default:"20971520"`     // The maximum size of the post request
 	} `json:"fileConfig"`
 	CacheConfig struct {
 		// Cache configuration
@@ -146,9 +149,18 @@ func InitConfig() {
 		panic(err)
 	}
 
+	// Set the default values
+	confutil.SetDefaults(&GofletCfg)
+
 	// Set the default value for the cache type
 	if !GofletCfg.JWTConfig.Enabled {
-		fmt.Printf("[WARN] JWT is disabled, the security of the application is not guaranteed.")
+		fmt.Println("[WARN] JWT is disabled, the security of the application is not guaranteed.")
+	}
+
+	// Print the configuration if the debug mode is enabled
+	if GofletCfg.Debug {
+		fmt.Println("[WARN] Debug mode is enabled, the application is not suitable for production.")
+		fmt.Printf("%+v\n", GofletCfg)
 	}
 }
 
