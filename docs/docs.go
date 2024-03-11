@@ -507,20 +507,21 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
+            "post": {
                 "security": [
                     {
                         "Authorization": []
                     }
                 ],
-                "description": "Create an upload session with a partial file upload, supports range requests, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt",
+                "description": "Upload a small file using a POST request, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt",
                 "consumes": [
-                    "*/*"
+                    "multipart/form-data"
                 ],
                 "tags": [
-                    "File"
+                    "File",
+                    "Upload"
                 ],
-                "summary": "Partial File Upload",
+                "summary": "Upload Small File",
                 "parameters": [
                     {
                         "type": "string",
@@ -528,52 +529,12 @@ const docTemplate = `{
                         "name": "path",
                         "in": "path",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "Accepted",
-                        "schema": {
-                            "type": "string"
-                        }
                     },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "403": {
-                        "description": "Directory creation not allowed",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
                     {
-                        "Authorization": []
-                    }
-                ],
-                "description": "Complete an upload session with a partial file upload. You should first upload the file with a PUT request, then complete the upload with a POST request, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt",
-                "tags": [
-                    "File"
-                ],
-                "summary": "Complete File Upload",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "File path",
-                        "name": "path",
-                        "in": "path",
+                        "type": "file",
+                        "description": "File",
+                        "name": "file",
+                        "in": "formData",
                         "required": true
                     }
                 ],
@@ -598,6 +559,12 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "File completion in progress",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "413": {
+                        "description": "File too large, please use PUT method to upload large files",
                         "schema": {
                             "type": "string"
                         }
@@ -721,6 +688,153 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "File not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload/{path}": {
+            "put": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "description": "Create an upload session with a partial file upload, supports range requests, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt",
+                "consumes": [
+                    "*/*"
+                ],
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Partial File Upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Directory creation not allowed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "description": "Complete an upload session with a partial file upload. You should first upload the file with a PUT request, then complete the upload with a POST request, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt",
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Complete Partial File Upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "File not found or upload not started",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "File completion in progress",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Cancel an upload session, {path} should be the relative path of the file, starting from the root directory, e.g. /upload/path/to/file.txt",
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Cancel Upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Upload session not found",
                         "schema": {
                             "type": "string"
                         }
