@@ -883,11 +883,11 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "unknown",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "GoFlet API",
+	Title:            "Goflet API",
 	Description:      "Goflet is a lightweight file upload and download service written in Go.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

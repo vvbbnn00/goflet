@@ -99,7 +99,8 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  title: GoFlet API
+  title: Goflet API
+  version: unknown
 paths:
   /api/action/copy:
     post:

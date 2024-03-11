@@ -10,6 +10,7 @@ import (
 )
 
 // @title           Goflet API
+// @version         unknown
 // @description     Goflet is a lightweight file upload and download service written in Go.
 
 // @contact.name   vvbbnn00
