@@ -41,7 +41,8 @@
     "allowFolderCreation": true,
     "uploadPath": "upload",
     "uploadLimit": 1073741824,
-    "uploadTimeout": 7200
+    "uploadTimeout": 7200,
+    "maxPostSize": 20971520
   },
   "cacheConfig": {
     "cacheType": "MemoryCache",

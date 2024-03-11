@@ -35,6 +35,9 @@ func RegisterRoutes() *gin.Engine {
 	// Router should be created after setting the mode
 	router := gin.Default()
 
+	// Set the max POST data size
+	router.MaxMultipartMemory = config.GofletCfg.FileConfig.MaxPostSize
+
 	// Log the requests
 	router.Use(middleware.SafeLogger())
 
