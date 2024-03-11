@@ -55,7 +55,7 @@ func RegisterRoutes() *gin.Engine {
 	api.RegisterRoutes(router)
 
 	// Enable swagger doc if it is enabled
-	if config.GofletCfg.SwaggerDocEnabled {
+	if config.GofletCfg.SwaggerEnabled {
 		docs.SwaggerInfo.Version = base.Version
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
