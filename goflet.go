@@ -9,7 +9,7 @@ import (
 	"github.com/vvbbnn00/goflet/util/log"
 )
 
-// @title           GoFlet API
+// @title           Goflet API
 // @description     Goflet is a lightweight file upload and download service written in Go.
 
 // @contact.name   vvbbnn00
