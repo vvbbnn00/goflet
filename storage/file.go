@@ -350,3 +350,32 @@ func MoveFile(src, dst *util.Path) error {
 	log.Debugf("Successfully moved folder from %s to %s", src, dst)
 	return nil
 }
+
+// CreateFile creates a new file at the provided path and updates the metadata
+func CreateFile(pathData *util.Path) error {
+	// Make sure the folder exists
+	err := os.MkdirAll(pathData.FsPath, os.ModePerm)
+	if err != nil {
+		log.Debugf("Error creating folder: %s", err.Error())
+		return err
+	}
+
+	// Create the file
+	filePath := filepath.Join(pathData.FsPath, model.FileAppend)
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR, model.FilePerm)
+	if err != nil {
+		log.Debugf("Error creating file: %s", err.Error())
+		return err
+	}
+	// Close the file
+	_ = file.Close()
+
+	// Update the metadata
+	fileMeta := model.FileMeta{
+		FileName:     filepath.Base(pathData.FsPath),
+		RelativePath: pathData.RelativePath,
+		UploadedAt:   time.Now().Unix(),
+	}
+
+	return UpdateFileMeta(pathData.FsPath, fileMeta)
+}

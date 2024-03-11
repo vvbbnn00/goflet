@@ -12,5 +12,6 @@ func RegisterRoutes(router *gin.RouterGroup) {
 		// Register the routes
 		r.POST("/copy", routeCopyFile)
 		r.POST("/move", routeMoveFile)
+		r.POST("/create", routeCreateFile)
 	}
 }
