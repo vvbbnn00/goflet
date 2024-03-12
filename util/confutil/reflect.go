@@ -8,6 +8,28 @@ import (
 	"strings"
 )
 
+// loadArr loads the array from the string array
+func loadArr(field reflect.Value, arr []string) {
+	switch field.Type().Elem().Kind() {
+	case reflect.String:
+		field.Set(reflect.ValueOf(arr))
+	case reflect.Int:
+		intArr := make([]int, len(arr))
+		for i, v := range arr {
+			intValue, err := strconv.Atoi(v)
+			if err != nil {
+				// Handle the error if the conversion fails
+				fmt.Println("Error converting string to int:", err)
+				return
+			}
+			intArr[i] = intValue
+		}
+		field.Set(reflect.ValueOf(intArr))
+	default:
+		panic("unsupported type:" + field.Type().Elem().Kind().String())
+	}
+}
+
 // SetDefaults sets the default values for the fields of the configuration
 func SetDefaults(config interface{}) {
 	v := reflect.ValueOf(config).Elem()
@@ -53,7 +75,7 @@ func SetDefaults(config interface{}) {
 			if field.Len() == 0 {
 				s := reflect.ValueOf(defaultTag)
 				arr := strings.Split(s.String(), ",")
-				field.Set(reflect.ValueOf(arr))
+				loadArr(field, arr)
 			}
 		default:
 			panic("unsupported type:" + field.Kind().String())
