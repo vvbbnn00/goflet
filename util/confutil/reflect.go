@@ -10,6 +10,7 @@ import (
 
 // loadArr loads the array from the string array
 func loadArr(field reflect.Value, arr []string) {
+	//nolint:exhaustive
 	switch field.Type().Elem().Kind() {
 	case reflect.String:
 		field.Set(reflect.ValueOf(arr))
