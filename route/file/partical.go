@@ -1,6 +1,7 @@
 package file
 
 import (
+	"github.com/vvbbnn00/goflet/config"
 	"io"
 	"net/http"
 	"os"
@@ -22,16 +23,19 @@ import (
 // @Success      202  {object} string	"Accepted"
 // @Failure      400  {object} string	"Bad request"
 // @Failure      403  {object} string	"Directory creation not allowed"
+// @Failure		 413  {object} string   "File too large"
 // @Failure      500  {object} string	"Internal server error"
 // @Router       /upload/{path} [put]
 // @Security	 Authorization
 func routePutUpload(c *gin.Context) {
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, config.GofletCfg.FileConfig.MaxPostSize)
+
 	relativePath := c.GetString("relativePath")
 
 	// Parse the range
 	byteStart, byteEnd, _, err := util.HeaderParseRangeUpload(c.GetHeader("Content-Range"), c.GetHeader("Content-Length"))
 	if err != nil {
-		c.JSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -40,16 +44,16 @@ func routePutUpload(c *gin.Context) {
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "directory_creation" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Directory creation not allowed"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Directory creation not allowed"})
 			return
 		}
 		log.Warnf("Error getting write stream: %s", errStr)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 	defer func() {
 		if closeErr := writeStream.Close(); closeErr != nil {
-			log.Warnf("Error closing write stream: %s", closeErr.Error())
+			log.Debugf("Error closing write stream: %s", closeErr.Error())
 		}
 	}()
 
@@ -63,20 +67,26 @@ func routePutUpload(c *gin.Context) {
 	_, err = writeStream.Seek(byteStart, io.SeekStart)
 	if err != nil {
 		log.Warnf("Error seeking write stream: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 
 	// Write the range to the file
 	written, err := io.CopyN(writeStream, body, byteEnd-byteStart+1)
 	if err != nil {
+		// Body too large
+		if err.Error() == "http: request body too large" {
+			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "File too large, please use Content-Range header to upload large files"})
+			return
+		}
+		// Other errors
 		log.Warnf("Error writing to file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 	if written != byteEnd-byteStart+1 {
 		log.Warnf("Incomplete write: expected %d bytes, wrote %d bytes", byteEnd-byteStart+1, written)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Incomplete write"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Incomplete write"})
 		return
 	}
 
@@ -118,12 +128,12 @@ func routeDeleteUpload(c *gin.Context) {
 	err := upload.RemoveTempFile(relativePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Upload session not found"})
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Upload session not found"})
 			return
 		}
 		errStr := err.Error()
 		log.Debugf("Error deleting file: %s", errStr)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error deleting file"})
 		return
 	}
 
