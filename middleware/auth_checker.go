@@ -2,6 +2,7 @@
 package middleware
 
 import (
+	"github.com/vvbbnn00/goflet/config"
 	"net/http"
 	"net/url"
 	"strings"
@@ -24,6 +25,12 @@ const (
 // AuthChecker ensures the request is authenticated and authorized
 func AuthChecker() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Check if the JWT is enabled
+		if !*config.GofletCfg.JWTConfig.Enabled {
+			c.Next()
+			return
+		}
+
 		token := extractToken(c)
 		if token == "" {
 			unauthorized(c, "Missing token")
