@@ -2,10 +2,11 @@
 package middleware
 
 import (
-	"github.com/vvbbnn00/goflet/config"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/vvbbnn00/goflet/config"
 
 	"github.com/gin-gonic/gin"
 
