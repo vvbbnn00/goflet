@@ -1,10 +1,11 @@
 package file
 
 import (
-	"github.com/vvbbnn00/goflet/config"
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/vvbbnn00/goflet/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"

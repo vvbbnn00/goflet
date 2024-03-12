@@ -23,7 +23,7 @@ type CreateFileRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        body body CreateFileRequest true "Request body"
-// @Success      200  {object} string	"OK"
+// @Success      201  {object} string	"File created"
 // @Failure      400  {object} string	"Bad request"
 // @Failure      409  {object} string	"File exists"
 // @Failure      500  {object} string	"Internal server error"
@@ -68,5 +68,5 @@ func routeCreateFile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "File created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "File created"})
 }
