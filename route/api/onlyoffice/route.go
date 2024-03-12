@@ -49,27 +49,27 @@ func routeUpdateFile(c *gin.Context) {
 	o := onlyOfficeUpdateRequest{}
 	err := c.BindJSON(&o)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
 		return
 	}
 
 	// No need to update the file
 	if o.Status != 2 {
-		c.JSON(http.StatusOK, gin.H{"error": 0})
+		c.AbortWithStatusJSON(http.StatusOK, gin.H{"error": 0})
 		return
 	}
 
 	// Get the file info
 	_, err = storage.GetFileInfo(fsPath)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
 	// Get the file write stream
 	file, err := upload.GetTempFileWriteStream(relativePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 
@@ -77,7 +77,7 @@ func routeUpdateFile(c *gin.Context) {
 	resp, err := http.Get(o.URL)
 	if err != nil {
 		log.Warnf("Error downloading file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error downloading file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error downloading file"})
 		return
 	}
 	defer func() {
@@ -88,7 +88,7 @@ func routeUpdateFile(c *gin.Context) {
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		log.Warnf("Error writing downloaded file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 
@@ -100,7 +100,7 @@ func routeUpdateFile(c *gin.Context) {
 	if err != nil {
 		errStr := err.Error()
 		log.Warnf("Error completing file upload: %s", errStr)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error completing file upload"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error completing file upload"})
 		return
 	}
 

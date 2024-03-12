@@ -23,7 +23,7 @@ type CreateFileRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        body body CreateFileRequest true "Request body"
-// @Success      200  {object} string	"OK"
+// @Success      201  {object} string	"File created"
 // @Failure      400  {object} string	"Bad request"
 // @Failure      409  {object} string	"File exists"
 // @Failure      500  {object} string	"Internal server error"
@@ -34,7 +34,7 @@ func routeCreateFile(c *gin.Context) {
 	var req CreateFileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Debugf("Error binding request: %s", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
@@ -47,7 +47,7 @@ func routeCreateFile(c *gin.Context) {
 	// Check if the file already exists
 	if storage.FileExists(pathData.FsPath) {
 		log.Debugf("File already exists: %s", pathData.FsPath)
-		c.JSON(http.StatusConflict, gin.H{"error": "File already exists"})
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "File already exists"})
 		return
 	}
 
@@ -64,9 +64,9 @@ func routeCreateFile(c *gin.Context) {
 	err = storage.CreateFile(pathData)
 	if err != nil {
 		log.Debugf("Error creating file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error creating file"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "File created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "File created"})
 }

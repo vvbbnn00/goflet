@@ -42,7 +42,7 @@ func routeGetFileMeta(c *gin.Context) {
 	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
 		log.Debugf("Error getting file info: %s", err.Error())
-		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
