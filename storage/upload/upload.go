@@ -142,10 +142,16 @@ func completeUpload(fsPath string, tmpPath string, meta model.FileMeta) {
 	// The target file path
 	filePath := filepath.Join(fsPath, model.FileAppend)
 
-	// Rename the temporary file to the final file
-	err := storage.RenameFile(tmpPath, filePath)
+	err := os.MkdirAll(fsPath, os.ModePerm)
 	if err != nil {
-		log.Warnf("Error moving file: %s", err.Error())
+		log.Debugf("Error creating directory: %s", err.Error())
+		return // Give up if the directory cannot be created
+	}
+
+	// Rename the temporary file to the final file
+	err = storage.RenameFile(tmpPath, filePath)
+	if err != nil {
+		log.Debugf("Error moving file: %s", err.Error())
 		return // Give up if the file cannot be moved
 	}
 
