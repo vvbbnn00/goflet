@@ -39,7 +39,7 @@ func SetDefaults(config interface{}) {
 			// Should have a better way to parse bool
 			if field.IsNil() {
 				if defaultValue, err := strconv.ParseBool(defaultTag); err == nil {
-					field.SetBool(defaultValue)
+					field.Set(reflect.ValueOf(&defaultValue))
 				}
 			}
 		case reflect.Float64:
