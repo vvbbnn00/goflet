@@ -116,8 +116,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "File created",
                         "schema": {
                             "type": "string"
                         }
@@ -744,6 +744,12 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
+                    "413": {
+                        "description": "File too large",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
@@ -806,6 +812,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
                 "description": "Cancel an upload session, {path} should be the relative path of the file, starting from the root directory, e.g. /upload/path/to/file.txt",
                 "tags": [
                     "Upload"
