@@ -159,8 +159,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: File created
           schema:
             type: string
         "400":
@@ -582,6 +582,8 @@ paths:
           description: Internal server error
           schema:
             type: string
+      security:
+      - Authorization: []
       summary: Cancel Upload
       tags:
       - Upload
@@ -645,6 +647,10 @@ paths:
             type: string
         "403":
           description: Directory creation not allowed
+          schema:
+            type: string
+        "413":
+          description: File too large
           schema:
             type: string
         "500":
