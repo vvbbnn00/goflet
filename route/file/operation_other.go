@@ -116,9 +116,6 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 	_ = fileReader.Close()
 	// Close the write stream
 	_ = writeStream.Close()
-
-	// Complete the file upload
-	handleCompleteFileUpload(relativePath, c)
 }
 
 // handleCompleteFileUpload handles the completion of the file upload

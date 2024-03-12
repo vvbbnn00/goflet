@@ -150,5 +150,7 @@ func GetProcessParamsFromQuery(query url.Values) *ProcessParams {
 		params.Quality = 0
 	}
 
+	log.Debugf("Params: %s\n", params.Dump())
+
 	return params
 }
