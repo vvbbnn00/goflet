@@ -34,7 +34,7 @@ func routeCreateFile(c *gin.Context) {
 	var req CreateFileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Debugf("Error binding request: %s", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
@@ -47,7 +47,7 @@ func routeCreateFile(c *gin.Context) {
 	// Check if the file already exists
 	if storage.FileExists(pathData.FsPath) {
 		log.Debugf("File already exists: %s", pathData.FsPath)
-		c.JSON(http.StatusConflict, gin.H{"error": "File already exists"})
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "File already exists"})
 		return
 	}
 
@@ -64,7 +64,7 @@ func routeCreateFile(c *gin.Context) {
 	err = storage.CreateFile(pathData)
 	if err != nil {
 		log.Debugf("Error creating file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error creating file"})
 		return
 	}
 

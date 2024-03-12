@@ -43,7 +43,7 @@ func routeMoveFile(c *gin.Context) {
 	err := storage.MoveFile(sourcePath, targetPath)
 	if err != nil {
 		log.Debugf("Error moving file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error moving file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error moving file"})
 		return
 	}
 

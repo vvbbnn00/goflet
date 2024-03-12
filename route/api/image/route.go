@@ -51,13 +51,13 @@ func routeGetImage(c *gin.Context) {
 	// Get the file info
 	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
 	// Check if the file is an image
 	if !fileInfo.IsImage() {
-		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
@@ -65,7 +65,7 @@ func routeGetImage(c *gin.Context) {
 
 	// Check if the file is too large
 	if fileInfo.FileSize > config.GofletCfg.ImageConfig.MaxFileSize {
-		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "File too large"})
+		c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "File too large"})
 		return
 	}
 
@@ -93,7 +93,7 @@ func routeGetImage(c *gin.Context) {
 	// Get the file read stream
 	reader, err := storage.GetFileReader(fsPath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
 	defer func() {
@@ -104,11 +104,11 @@ func routeGetImage(c *gin.Context) {
 
 	if err != nil {
 		if err.Error() == "image size is too large" {
-			c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Image size is too large"})
+			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Image size is too large"})
 			return
 		}
 		log.Warnf("Error processing image: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing image"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error processing image"})
 		return
 	}
 

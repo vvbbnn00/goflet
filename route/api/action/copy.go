@@ -43,7 +43,7 @@ func routeCopyFile(c *gin.Context) {
 	err := storage.CopyFile(sourcePath, targetPath)
 	if err != nil {
 		log.Debugf("Error copying file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error copying file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error copying file"})
 		return
 	}
 

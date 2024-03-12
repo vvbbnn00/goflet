@@ -35,12 +35,12 @@ func routePostFile(c *gin.Context) {
 
 	// If error is not nil and the error is "http: request body too large", return a 413 status code
 	if err != nil && err.Error() == "http: request body too large" {
-		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "File too large, please use PUT method to upload large files"})
+		c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "File too large, please use PUT method to upload large files"})
 		return
 	}
 	if err != nil {
 		log.Warnf("Error getting file: %s", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 	// If the file is not nil, handle the single file upload
@@ -69,11 +69,11 @@ func routeDeleteFile(c *gin.Context) {
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "file_not_found" {
-			c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
 			return
 		}
 		log.Warnf("Error deleting file: %s", errStr)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error deleting file"})
 		return
 	}
 
@@ -88,11 +88,11 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "directory_creation" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Directory creation not allowed"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Directory creation not allowed"})
 			return
 		}
 		log.Warnf("Error getting write stream: %s", errStr)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 
@@ -100,7 +100,7 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 	fileReader, err := file.Open()
 	if err != nil {
 		log.Warnf("Error opening file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
 
@@ -108,7 +108,7 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 	_, err = io.Copy(writeStream, fileReader)
 	if err != nil {
 		log.Warnf("Error copying file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
 		return
 	}
 
@@ -124,15 +124,15 @@ func handleCompleteFileUpload(relativePath string, c *gin.Context) {
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "file_uploading" {
-			c.JSON(http.StatusConflict, gin.H{"error": "The file completion is in progress"})
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "The file completion is in progress"})
 			return
 		}
 		if errStr == "file_not_found" {
-			c.JSON(http.StatusNotFound, gin.H{"error": "File not found or upload not started"})
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found or upload not started"})
 			return
 		}
 		log.Warnf("Error completing file upload: %s", errStr)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error completing file upload"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error completing file upload"})
 		return
 	}
 

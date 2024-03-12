@@ -43,7 +43,7 @@ func routeGetFile(c *gin.Context) {
 	fileInfo, err := storage.GetFileInfo(fsPath)
 	if err != nil {
 		log.Debugf("Error getting file info: %s", err.Error())
-		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
@@ -64,7 +64,7 @@ func routeGetFile(c *gin.Context) {
 	file, err := storage.GetFileReader(fsPath)
 	if err != nil {
 		log.Warnf("Error getting file reader: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
 	defer func(file *os.File) {
@@ -132,7 +132,7 @@ func handleRangeRequests(c *gin.Context, file *os.File, fileInfo *model.FileInfo
 
 	byteStart, byteEnd, err := util.HeaderParseRangeDownload(rangeHeader, fileInfo.FileSize)
 	if err != nil {
-		c.JSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": err.Error()})
 		return
 	}
 	contentLength := byteEnd - byteStart + 1
@@ -142,7 +142,7 @@ func handleRangeRequests(c *gin.Context, file *os.File, fileInfo *model.FileInfo
 
 	if _, err := file.Seek(byteStart, io.SeekStart); err != nil {
 		log.Warnf("Error seeking file: %s", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
 		return
 	}
 

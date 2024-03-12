@@ -34,13 +34,13 @@ type CopyMoveFileRequest struct {
 // checkPath checks if the path is not empty
 func checkPath(path string, c *gin.Context) (*util.Path, error) {
 	if path == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Path is required"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Path is required"})
 		return nil, errors.New("Path is required")
 	}
 
 	pathData, err := util.ParsePath(path)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return nil, err
 	}
 
@@ -53,7 +53,7 @@ func preCheckForCopyMoveRoute(c *gin.Context) (*util.Path, *util.Path, bool) {
 	var req CopyMoveFileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Debugf("Error binding request: %s", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return nil, nil, false
 	}
 
@@ -71,13 +71,13 @@ func preCheckForCopyMoveRoute(c *gin.Context) (*util.Path, *util.Path, bool) {
 
 	// Check if the source and target paths are the same
 	if sourcePath.FsPath == targetPath.FsPath {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Source and target paths are the same"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Source and target paths are the same"})
 		return nil, nil, false
 	}
 
 	// Check if the source file exists
 	if !storage.FileExists(sourcePath.FsPath) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Source file not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Source file not found"})
 		return nil, nil, false
 	}
 
@@ -87,13 +87,13 @@ func preCheckForCopyMoveRoute(c *gin.Context) (*util.Path, *util.Path, bool) {
 		default:
 			fallthrough
 		case OnConflictActionAbort:
-			c.JSON(http.StatusConflict, gin.H{"error": "File already exists"})
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "File already exists"})
 			return nil, nil, false
 		case OnConflictActionOverwrite:
 			// Delete the target file
 			err := storage.DeleteFile(targetPath.FsPath)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting target file"})
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error deleting target file"})
 				return nil, nil, false
 			}
 		}
