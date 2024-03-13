@@ -88,14 +88,23 @@ func queryMatch(query url.Values, permQuery map[string]string) bool {
 	return true
 }
 
+// replaceMultipleSlashes Replace multiple slashes with a single slash
+func replaceMultipleSlashes(input string) string {
+	for strings.Contains(input, "//") {
+		// Replace multiple slashes with a single slash
+		input = strings.ReplaceAll(input, "//", "/")
+	}
+	return strings.ReplaceAll(input, "\\", "/") // Replace \ with /
+}
+
 // isAuthorized Check if the token is authorized to access the path
 func isAuthorized(c *gin.Context, permissions []util.Permission) bool {
-	currentPath := c.Request.URL.Path
+	currentPath := replaceMultipleSlashes(c.Request.URL.Path) // Clean the path (only replace multiple slashes)
 	method := c.Request.Method
 
 	for _, perm := range permissions {
 		// Check if the path matches
-		match := util.Match(currentPath, perm.Path)
+		match := util.Match(currentPath, replaceMultipleSlashes(perm.Path))
 		// Check if the method matches
 		if match || perm.Path == "*" {
 			return util.MatchMethod(method, perm.Methods) && queryMatch(c.Request.URL.Query(), perm.Query)

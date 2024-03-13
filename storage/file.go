@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/vvbbnn00/goflet/cache"
@@ -202,6 +203,19 @@ func DeleteFile(fsPath string) error {
 	return nil
 }
 
+// moveFileCrossDevice If the source and destination are on different devices, use io.Copy to move the file
+func moveFileCrossDevice(src, dst string) error {
+	err := copyFile(src, dst)
+	if err != nil {
+		return err
+	}
+	err = os.Remove(src)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // RenameFile moves the file from the old path to the new path
 func RenameFile(oldPath, newPath string) error {
 	retryCount := 0
@@ -209,9 +223,16 @@ func RenameFile(oldPath, newPath string) error {
 	// Rename the temporary file to the final file
 	for {
 		err := os.Rename(oldPath, newPath) // This will replace the file if it already exists
+		// Check if the error is a link error and the error is EXDEV (cross-device link)
+		var linkErr *os.LinkError
+		if errors.As(err, &linkErr) && errors.Is(linkErr.Err, syscall.EXDEV) {
+			log.Debugf("Moving file across devices: %s -> %s", oldPath, newPath)
+			err = moveFileCrossDevice(oldPath, newPath)
+		}
 		if err == nil {
 			return nil
 		}
+
 		time.Sleep(time.Duration(retryCount) * time.Millisecond) // Sleep for a while before retrying, max 5 seconds in total
 		retryCount++
 		if retryCount >= maxRetryCount {
@@ -330,7 +351,7 @@ func MoveFile(src, dst *util.Path) error {
 	}
 
 	// Move the folder
-	err = os.Rename(src.FsPath, dst.FsPath)
+	err = RenameFile(src.FsPath, dst.FsPath)
 	if err != nil {
 		log.Debugf("Error moving folder: %s", err.Error())
 		return err

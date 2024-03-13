@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # - ./goflet.json:/app/goflet.json
+      - ./goflet.json:/app/goflet.json
       - ./data:/app/data
       - ./upload:/app/upload
     extra_hosts:
