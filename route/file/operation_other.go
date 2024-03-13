@@ -44,7 +44,10 @@ func routePostFile(c *gin.Context) {
 		return
 	}
 	// If the file is not nil, handle the single file upload
-	handleSingleFileUpload(file, c)
+	err = handleSingleFileUpload(file, c)
+	if err != nil {
+		return // Avoid calling handleCompleteFileUpload
+	}
 
 	// Complete the file upload
 	relativePath := c.GetString("relativePath")
@@ -81,7 +84,7 @@ func routeDeleteFile(c *gin.Context) {
 }
 
 // handleSingleFileUpload handles the single file upload
-func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
+func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) error {
 	// Get temp file write stream
 	relativePath := c.GetString("relativePath")
 	writeStream, err := upload.GetTempFileWriteStream(relativePath)
@@ -89,11 +92,11 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 		errStr := err.Error()
 		if errStr == "directory_creation" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Directory creation not allowed"})
-			return
+			return err
 		}
 		log.Warnf("Error getting write stream: %s", errStr)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
-		return
+		return err
 	}
 
 	// Open the file
@@ -101,7 +104,7 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 	if err != nil {
 		log.Warnf("Error opening file: %s", err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error reading file"})
-		return
+		return err
 	}
 
 	// Copy the file to the write stream
@@ -109,13 +112,15 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) {
 	if err != nil {
 		log.Warnf("Error copying file: %s", err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Error writing file"})
-		return
+		return err
 	}
 
 	// Close the file
 	_ = fileReader.Close()
 	// Close the write stream
 	_ = writeStream.Close()
+
+	return nil
 }
 
 // handleCompleteFileUpload handles the completion of the file upload
