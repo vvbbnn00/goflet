@@ -6,9 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./goflet.json:/app/goflet.json
-      - ./data:/app/data
-      - ./upload:/app/upload
+      - ./goflet-data:/data
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always

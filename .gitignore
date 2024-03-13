@@ -9,3 +9,4 @@ cert
 winres.json
 *.syso
 /dist
+/goflet-data

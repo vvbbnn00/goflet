@@ -10,3 +10,4 @@ cert
 winres/*
 .github
 /dist
+/goflet-data
