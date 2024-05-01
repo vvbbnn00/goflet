@@ -51,7 +51,7 @@ func routePostFile(c *gin.Context) {
 
 	// Complete the file upload
 	relativePath := c.GetString("relativePath")
-	handleCompleteFileUpload(relativePath, c)
+	handleCompleteFileUpload(relativePath, c, false)
 }
 
 // routeDeleteFile handler for DELETE /file/*path
@@ -124,8 +124,8 @@ func handleSingleFileUpload(file *multipart.FileHeader, c *gin.Context) error {
 }
 
 // handleCompleteFileUpload handles the completion of the file upload
-func handleCompleteFileUpload(relativePath string, c *gin.Context) {
-	err := upload.CompleteFileUpload(relativePath)
+func handleCompleteFileUpload(relativePath string, c *gin.Context, async bool) {
+	err := upload.CompleteFileUpload(relativePath, async)
 	if err != nil {
 		errStr := err.Error()
 		if errStr == "file_uploading" {

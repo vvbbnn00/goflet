@@ -96,7 +96,7 @@ func routeUpdateFile(c *gin.Context) {
 	_ = file.Close()
 
 	// Complete the file upload
-	err = upload.CompleteFileUpload(relativePath)
+	err = upload.CompleteFileUpload(relativePath, false)
 	if err != nil {
 		errStr := err.Error()
 		log.Warnf("Error completing file upload: %s", errStr)

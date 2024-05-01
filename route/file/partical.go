@@ -100,6 +100,7 @@ func routePutUpload(c *gin.Context) {
 // @Description  Complete an upload session with a partial file upload. You should first upload the file with a PUT request, then complete the upload with a POST request, {path} should be the relative path of the file, starting from the root directory, e.g. /file/path/to/file.txt
 // @Tags         Upload
 // @Param        path path string true "File path"
+// @Param        async query bool false "Async upload"
 // @Success      201  {object} string	"Created"
 // @Failure      400  {object} string	"Bad request"
 // @Failure      404  {object} string	"File not found or upload not started"
@@ -110,7 +111,9 @@ func routePutUpload(c *gin.Context) {
 func routePostUpload(c *gin.Context) {
 	// Complete the file upload
 	relativePath := c.GetString("relativePath")
-	handleCompleteFileUpload(relativePath, c)
+	// Is async upload enabled
+	async := c.GetBool("async")
+	handleCompleteFileUpload(relativePath, c, async)
 }
 
 // routeDeleteUpload handler for DELETE /upload/*path

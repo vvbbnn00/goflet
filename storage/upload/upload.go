@@ -80,7 +80,7 @@ func GetTempFileWriteStream(relativePath string) (*os.File, error) {
 }
 
 // CompleteFileUpload Complete the file upload by renaming the temporary file to the final file
-func CompleteFileUpload(relativePath string) error {
+func CompleteFileUpload(relativePath string, async bool) error {
 	fileName := hash.StringSha3New256(relativePath) // Get the hash of the path
 	tmpPath := filepath.Join(uploadPath, fileName)
 	c := cache.GetCache()
@@ -120,12 +120,21 @@ func CompleteFileUpload(relativePath string) error {
 	}
 
 	// Complete the upload
-	go completeUpload(fsPath, tmpPath, model.FileMeta{
-		RelativePath: relativePath,
-		FileName:     filepath.Base(relativePath),
-		MimeType:     mimeTypeStr,
-		UploadedAt:   time.Now().Unix(),
-	})
+	if async {
+		go completeUpload(fsPath, tmpPath, model.FileMeta{
+			RelativePath: relativePath,
+			FileName:     filepath.Base(relativePath),
+			MimeType:     mimeTypeStr,
+			UploadedAt:   time.Now().Unix(),
+		})
+	} else {
+		completeUpload(fsPath, tmpPath, model.FileMeta{
+			RelativePath: relativePath,
+			FileName:     filepath.Base(relativePath),
+			MimeType:     mimeTypeStr,
+			UploadedAt:   time.Now().Unix(),
+		})
+	}
 
 	return nil
 }
