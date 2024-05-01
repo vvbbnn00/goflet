@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 
@@ -107,7 +108,7 @@ func CanMakeFastResponse(c *gin.Context, fileInfo *model.FileInfo) bool {
 // SetCommonHeaders sets common headers for the response
 func SetCommonHeaders(c *gin.Context, fileInfo *model.FileInfo) {
 	c.Header("Content-Type", getContentType(fileInfo))
-	c.Header("Content-Disposition", "attachment; filename="+fileInfo.FileMeta.FileName)
+	c.Header("Content-Disposition", "attachment; filename="+url.QueryEscape(fileInfo.FileMeta.FileName))
 	c.Header("Last-Modified", util.Int64ToHeaderDate(fileInfo.LastModified))
 	c.Header("ETag", generateETag(fileInfo))
 
