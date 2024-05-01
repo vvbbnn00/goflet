@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -175,16 +176,26 @@ func ClarifyPath(path string) (string, error) {
 	return cleanPath, nil
 }
 
+// pathEncode Encode the path without encoding the /
+func pathEncode(path string) string {
+	parts := strings.Split(path, "/")
+	for i, part := range parts {
+		parts[i] = url.PathEscape(part)
+	}
+	return strings.Join(parts, "/")
+}
+
 // Match the pattern with the name
-func Match(pattern, name string) bool {
+func Match(checkString, pattern string) bool {
+	// fmt.Printf("checkString: %s, pattern: %s\n, pathEncode(checkString): %s\n", checkString, pattern, pathEncode(checkString))
 	// If it has no *, just compare the strings
 	if !strings.Contains(pattern, "*") {
-		return pattern == name
+		return pattern == checkString || pattern == pathEncode(checkString)
 	}
-
 	// Split the pattern by *
 	parts := strings.Split(pattern, "*")
-	return strings.HasPrefix(name, parts[0]) // Only compare the first part
+	// Name should be url encoded
+	return strings.HasPrefix(checkString, parts[0]) || strings.HasPrefix(pathEncode(checkString), parts[0])
 }
 
 // MatchMethod Match the method with the methods
